@@ -315,24 +315,17 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 						int vp8h = swap2(*(unsigned short *)(c + 5)) & 0x3fff;
 						int vp8hs = swap2(*(unsigned short *)(c + 5)) >> 14;
 						JANUS_LOG(LOG_VERB, "(seq=%" SCNu16 ", ts=%" SCNu64 ") Key frame: %dx%d (scale=%dx%d)\n", tmp->seq, tmp->ts, vp8w, vp8h, vp8ws, vp8hs);
-								
-						
+
 						/* FIX frame dimensions */
 						if (vp8w > max_width || vp8h > max_height)
 						{
-							JANUS_LOG(LOG_VERB, "count seq = %" SCNu16 "\n", tmp->seq);
-							
-							if (last_frame == 0 || ((tmp->seq - last_frame) > 10 && (frame_count - tmp->seq) > 10)) {
-						
-						                JANUS_LOG(LOG_VERB, "matched seq = %" SCNu16 "\n", tmp->seq);
-								
-								if (vp8w > max_width) {
+							if (last_frame == 0 || ((tmp->seq - last_frame) > 10 && (frame_count - tmp->seq) > 10)) 
+							{
+								if (vp8w > max_width)
 									max_width = vp8w;
-								}
 
-								if (vp8h > max_height) {
+								if (vp8h > max_height)
 									max_height = vp8h;
-								}
 								
 								last_frame = tmp->seq;
 							}
