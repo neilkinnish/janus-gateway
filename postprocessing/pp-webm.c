@@ -182,23 +182,28 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 	char prebuffer[1500];
 	memset(prebuffer, 0, 1500);
 	
-	while (tmp)
+	janus_pp_frame_packet *tmp2 = list;
+	int bytes2 = 0;
+	char prebuffer2[1500];
+	memset(prebuffer2, 0, 1500);
+	
+	while (tmp2)
 	{
-		if (tmp->drop) {
-			tmp = tmp->next;
+		if (tmp2->drop) {
+			tmp2 = tmp2->next;
 			continue;
 		}
 		if (vp8) {
-			fseek(file, tmp->offset + 12 + tmp->skip, SEEK_SET);
-			bytes = fread(prebuffer, sizeof(char), 16, file);
+			fseek(file, tmp2->offset + 12 + tmp2->skip, SEEK_SET);
+			bytes2 = fread(prebuffer2, sizeof(char), 16, file);
 			if (bytes != 16)
 			{
-				tmp = tmp->next;
+				tmp2 = tmp2->next;
 				continue;
 			}
 		}
-		frame_count = tmp->seq;
-		tmp = tmp->next;
+		frame_count = tmp2->seq;
+		tmp2 = tmp2->next;
 	}
 	
 	JANUS_LOG(LOG_INFO, " FRAMES --> (%" SCNu16 ")\n", frame_count);
