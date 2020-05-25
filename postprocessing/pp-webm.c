@@ -182,31 +182,32 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 	char prebuffer[1500];
 	memset(prebuffer, 0, 1500);
 	
-	janus_pp_frame_packet *tmp2 = list;
-	int bytes2 = 0;
-	char prebuffer2[1500];
-	memset(prebuffer2, 0, 1500);
+	janus_pp_frame_packet *tmpp = list;
+	int bytess = 0;
+	char prebufferr[1500];
+	memset(prebufferr, 0, 1500);
+	FILE *filee = *file;
 	
-	while (tmp2)
+	while (tmpp)
 	{
-		if (tmp2->drop) {
-			tmp2 = tmp2->next;
+		if (tmpp->drop) {
+			tmpp = tmpp->next;
 			continue;
 		}
 		if (vp8) {
-			fseek(file, tmp2->offset + 12 + tmp2->skip, SEEK_SET);
-			bytes2 = fread(prebuffer2, sizeof(char), 16, file);
-			if (bytes != 16)
+			fseek(filee, tmpp->offset + 12 + tmpp->skip, SEEK_SET);
+			bytess = fread(prebufferr, sizeof(char), 16, filee);
+			if (bytess != 16)
 			{
-				tmp2 = tmp2->next;
+				tmpp = tmpp->next;
 				continue;
 			}
 		}
-		frame_count = tmp2->seq;
-		tmp2 = tmp2->next;
+		frame_count = tmpp->seq;
+		tmpp = tmpp->next;
 	}
 	
-	JANUS_LOG(LOG_INFO, " FRAMES --> (%" SCNu16 ")\n", frame_count);
+	JANUS_LOG(LOG_INFO, " FRAMES > %" SCNu16 "\n", frame_count);
 	
 	while (tmp)
 	{
@@ -319,9 +320,11 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 						/* FIX frame dimensions */
 						if (vp8w > max_width || vp8h > max_height)
 						{
+							JANUS_LOG(LOG_VERB, "count seq = %" SCNu16 "\n", tmp->seq);
+							
 							if (last_frame == 0 || ((tmp->seq - last_frame) > 10 && (frame_count - tmp->seq) > 10)) {
 						
-						                JANUS_LOG(LOG_VERB, "(lf = %" SCNu16 ", sq = %" SCNu16 ", > 10 =%" SCNu16 ", > 10 =%" SCNu16 ")\n", last_frame, tmp->seq, tmp->seq - last_frame, frame_count - tmp->seq);
+						                JANUS_LOG(LOG_VERB, "matched seq = %" SCNu16 "\n", tmp->seq);
 								
 								if (vp8w > max_width) {
 									max_width = vp8w;
