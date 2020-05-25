@@ -64,6 +64,7 @@ static AVCodecContext *vEncoder;
 #endif
 static int max_width = 0, max_height = 0, fps = 0;
 static int16_t last_frame = 0;
+static int16_t frame_count = 0;
 
 int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8)
 {
@@ -181,7 +182,25 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 	char prebuffer[1500];
 	memset(prebuffer, 0, 1500);
 	
-	JANUS_LOG(LOG_INFO, " FRAMES --> (%" SCNu16 ")", tmp->len);
+	while (tmp)
+	{
+		if (tmp->drop) {
+			tmp = tmp->next;
+			continue;
+		}
+		if (vp8) {
+			fseek(file, tmp->offset + 12 + tmp->skip, SEEK_SET);
+			bytes = fread(prebuffer, sizeof(char), 16, file);
+			if (bytes != 16)
+			{
+				tmp = tmp->next;
+				continue;
+			}
+		}
+		frame_count = tmp->seq;
+	}
+	
+	JANUS_LOG(LOG_INFO, " FRAMES --> (%" SCNu16 ")", frame_count);
 	
 	while (tmp)
 	{
@@ -293,7 +312,7 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 						/* FIX frame dimensions */
 						if (vp8w > max_width || vp8h > max_height)
 						{
-							if (last_frame == 0 || ((tmp->seq - last_frame) > 10 && (tmp->len - last_frame) > 10)) {
+							if (last_frame == 0 || ((tmp->seq - last_frame) > 10 && (frame_count - last_frame) > 10)) {
 								if (vp8w > max_width) {
 									max_width = vp8w;
 									last_frame = tmp->seq;
