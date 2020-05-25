@@ -181,7 +181,7 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 	char prebuffer[1500];
 	memset(prebuffer, 0, 1500);
 	
-	JANUS_LOG(LOG_INFO, " FRAMES --> (%" SCNu16 ")", tmp->len)
+	JANUS_LOG(LOG_INFO, " FRAMES --> (%" SCNu16 ")", tmp->len);
 	
 	while (tmp)
 	{
