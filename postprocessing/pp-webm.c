@@ -198,6 +198,7 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 			}
 		}
 		frame_count = tmp->seq;
+		tmp = tmp->next;
 	}
 	
 	JANUS_LOG(LOG_INFO, " FRAMES --> (%" SCNu16 ")", frame_count);
