@@ -201,7 +201,7 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 		tmp = tmp->next;
 	}
 	
-	JANUS_LOG(LOG_INFO, " FRAMES --> (%" SCNu16 ")", frame_count);
+	JANUS_LOG(LOG_INFO, " FRAMES --> (%" SCNu16 ")\n", frame_count);
 	
 	while (tmp)
 	{
@@ -313,7 +313,7 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 						/* FIX frame dimensions */
 						if (vp8w > max_width || vp8h > max_height)
 						{
-							if (last_frame == 0 || ((tmp->seq - last_frame) > 10 && (frame_count - last_frame) > 10)) {
+							if (last_frame == 0 || ((tmp->seq - last_frame) > 10 && (frame_count - tmp->seq) > 10)) {
 								if (vp8w > max_width) {
 									max_width = vp8w;
 									last_frame = tmp->seq;
