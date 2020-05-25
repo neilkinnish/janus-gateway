@@ -290,6 +290,14 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 						{
 							set_width = vp8w;
 							set_height = vp8h;
+							
+							if (vp8w > max_width) {
+								max_width = vp8w;
+							}
+							
+							if (vp8h > max_height) {
+								max_height = vp8h;
+							}
 						}
 					}
 				}
