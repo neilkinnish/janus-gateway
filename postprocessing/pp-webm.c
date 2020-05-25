@@ -186,7 +186,7 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 	int bytess = 0;
 	char prebufferr[1500];
 	memset(prebufferr, 0, 1500);
-	FILE *filee = *file;
+	FILE *filee = file;
 	
 	while (tmpp)
 	{
