@@ -258,7 +258,11 @@ nat: {
 	# such, use the option with caution and only if you know what you're doing.
 	# Make sure you keep ICE Lite disabled, though, as it's not strictly
 	# speaking a publicly reachable server, and a NAT is still involved.
+	# If you'd rather keep the private IP address in place, rather than
+	# replacing it (and so have both of them as advertised candidates),
+	# then set the 'keep_private_host' property to true.
 	#nat_1_1_mapping = "1.2.3.4"
+	#keep_private_host = true
 
 	# You can configure a TURN server in two different ways: specifying a
 	# statically configured TURN server, and thus provide the address of the
@@ -276,7 +280,9 @@ nat: {
 	# which is currently available in both rfc5766-turn-server and coturn.
 	# You enable this by specifying the address of your TURN REST API backend,
 	# the HTTP method to use (GET or POST) and, if required, the API key Janus
-	# must provide.
+	# must provide. Notice that the 'opaque_id' provided via Janus API will be
+	# used as the username for a specific PeerConnection by default; if that one
+	# is missing, the 'session_id' will be used as the username instead.
 	#turn_rest_api = "http://yourbackend.com/path/to/api"
 	#turn_rest_api_key = "anyapikeyyoumayhaveset"
 	#turn_rest_api_method = "GET"
