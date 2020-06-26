@@ -74,9 +74,15 @@ int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working)
 	int bytes = 0, len = 0, steps = 0, last_seq = 0;
 	uint64_t pos = 0;
 	uint8_t *buffer = g_malloc0(1500);
+
+	int count = 0;
+	while (tmp)
+	{
+		count++;
+	}
+
 	while (*working && tmp != NULL)
 	{
-		JANUS_LOG(LOG_WARN, "Pos: %06" SCNu64 "", (tmp->prev->ts - list->ts) / 48 / 20 + 1)
 		if (tmp->prev != NULL && ((tmp->ts - tmp->prev->ts) / 48 / 20 > 1))
 		{
 			JANUS_LOG(LOG_WARN, "Lost a packet here? (got seq %" SCNu16 " after %" SCNu16 ", time ~%" SCNu64 "s)\n",
@@ -86,12 +92,12 @@ int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working)
 			/* use ts differ to insert silence packet */
 			int silence_count = (tmp->ts - tmp->prev->ts) / 48 / 20 - 1;
 			pos = (tmp->prev->ts - list->ts) / 48 / 20 + 1;
-			JANUS_LOG(LOG_WARN, "[FILL] pos: %06" SCNu64 "", pos)
 			JANUS_LOG(LOG_WARN, "[FILL] pos: %06" SCNu64 ", writing silences (count=%d)\n", pos, silence_count);
 			int i = 0;
 			for (i = 0; i < silence_count; i++)
 			{
 				pos = (tmp->prev->ts - list->ts) / 48 / 20 + i + 1;
+				JANUS_LOG(LOG_WARN, "[>>>>] pos: %06" SCNu64 "\n", pos);
 				op->granulepos = 960 * (pos); /* FIXME: get this from the toc byte */
 				ogg_stream_packetin(stream, op);
 				ogg_write();
