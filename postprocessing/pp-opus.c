@@ -106,7 +106,7 @@ int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working)
 
 				if (pos > count)
 				{
-					JANUS_LOG(LOG_WARN, "[BREAKING SILENCE]\n");
+					JANUS_LOG(LOG_INFO, "[BREAKING SILENCE]\n");
 					break;
 				}
 
@@ -121,7 +121,7 @@ int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working)
 					ignoring++;
 				}
 			}
-			JANUS_LOG(LOG_WARN, "[IGNORING SILENCE] counted %d\n", ignoring);
+			JANUS_LOG(LOG_INFO, "[IGNORING SILENCE] counted %d\n", ignoring);
 			ogg_flush();
 			g_free(op);
 		}
