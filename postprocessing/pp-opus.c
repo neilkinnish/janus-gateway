@@ -107,22 +107,14 @@ int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working)
 
 				if (pos > count)
 				{
-					JANUS_LOG(LOG_WARN, "[BREAKING SILENCE]\n");
+					JANUS_LOG(LOG_WARN, "[BREAKING SILENCE] %06" SCNu64 "\n", pos);
 					break;
 				}
 
-				if (pos <= count)
-				{
-					op->granulepos = 960 * (pos); /* FIXME: get this from the toc byte */
-					ogg_stream_packetin(stream, op);
-					ogg_write();
-				}
-				else
-				{
-					ignoring++;
-				}
+				op->granulepos = 960 * (pos); /* FIXME: get this from the toc byte */
+				ogg_stream_packetin(stream, op);
+				ogg_write();
 			}
-			JANUS_LOG(LOG_WARN, "[IGNORING SILENCE] counted %d\n", ignoring);
 			ogg_flush();
 			g_free(op);
 		}
