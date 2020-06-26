@@ -94,14 +94,22 @@ int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working)
 			pos = (tmp->prev->ts - list->ts) / 48 / 20 + 1;
 			JANUS_LOG(LOG_WARN, "[FILL] pos: %06" SCNu64 ", writing silences (count=%d)\n", pos, silence_count);
 			int i = 0;
+			int ignoring = 0;
 			for (i = 0; i < silence_count; i++)
 			{
 				pos = (tmp->prev->ts - list->ts) / 48 / 20 + i + 1;
-				JANUS_LOG(LOG_WARN, "[>>>>] pos: %06" SCNu64 "\n", pos);
-				op->granulepos = 960 * (pos); /* FIXME: get this from the toc byte */
-				ogg_stream_packetin(stream, op);
-				ogg_write();
+				if (pos <= count)
+				{
+					op->granulepos = 960 * (pos); /* FIXME: get this from the toc byte */
+					ogg_stream_packetin(stream, op);
+					ogg_write();
+				}
+				else
+				{
+					ignoring++;
+				}
 			}
+			JANUS_LOG(LOG_WARN, "[IGNORING SILENCE] counted %" SCNu32 "\n", ignoring);
 			ogg_flush();
 			g_free(op);
 		}
