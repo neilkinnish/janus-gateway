@@ -70,6 +70,7 @@ int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working)
 	if (!file || !list || !working)
 		return -1;
 	janus_pp_frame_packet *tmp = list;
+	janus_pp_frame_packet *tmpCount = list;
 	long int offset = 0;
 	int bytes = 0, len = 0, steps = 0, last_seq = 0;
 	uint64_t pos = 0;
@@ -78,10 +79,10 @@ int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working)
 	// JANUS_LOG(LOG_WARN, "[READY] the count %d\n", count);
 
 	uint32_t count = 0;
-	while (tmp)
+	while (tmpCount)
 	{
 		count++;
-		tmp = tmp->next;
+		tmpCount = tmpCount->next;
 	}
 
 	while (*working && tmp != NULL)
@@ -106,7 +107,7 @@ int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working)
 
 				if (pos > count)
 				{
-					JANUS_LOG(LOG_INFO, "[BREAKING SILENCE]\n");
+					JANUS_LOG(LOG_WARN, "[BREAKING SILENCE]\n");
 					break;
 				}
 
@@ -121,7 +122,7 @@ int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working)
 					ignoring++;
 				}
 			}
-			JANUS_LOG(LOG_INFO, "[IGNORING SILENCE] counted %d\n", ignoring);
+			JANUS_LOG(LOG_WARN, "[IGNORING SILENCE] counted %d\n", ignoring);
 			ogg_flush();
 			g_free(op);
 		}
