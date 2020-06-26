@@ -81,6 +81,8 @@ int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working)
 		count++;
 	}
 
+	JANUS_LOG(LOG_WARN, "[READY] the count %d\n", count);
+
 	while (*working && tmp != NULL)
 	{
 		if (tmp->prev != NULL && ((tmp->ts - tmp->prev->ts) / 48 / 20 > 1))
@@ -98,6 +100,15 @@ int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working)
 			for (i = 0; i < silence_count; i++)
 			{
 				pos = (tmp->prev->ts - list->ts) / 48 / 20 + i + 1;
+
+				JANUS_LOG(LOG_WARN, "[>>] pos: %06" SCNu64 "\n", pos);
+
+				if (pos > count)
+				{
+					JANUS_LOG(LOG_WARN, "[BREAKING SILENCE]\n");
+					break;
+				}
+
 				if (pos <= count)
 				{
 					op->granulepos = 960 * (pos); /* FIXME: get this from the toc byte */
@@ -109,7 +120,7 @@ int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working)
 					ignoring++;
 				}
 			}
-			JANUS_LOG(LOG_WARN, "[IGNORING SILENCE] counted %" SCNu32 "\n", ignoring);
+			JANUS_LOG(LOG_WARN, "[IGNORING SILENCE] counted %d\n", ignoring);
 			ogg_flush();
 			g_free(op);
 		}
