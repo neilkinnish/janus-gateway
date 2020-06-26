@@ -65,7 +65,7 @@ int janus_pp_opus_create(char *destination, char *metadata)
 	return 0;
 }
 
-int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working, int *count)
+int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working)
 {
 	if (!file || !list || !working)
 		return -1;
@@ -75,7 +75,7 @@ int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working,
 	uint64_t pos = 0;
 	uint8_t *buffer = g_malloc0(1500);
 
-	JANUS_LOG(LOG_WARN, "[READY] the count %d\n", count);
+	// JANUS_LOG(LOG_WARN, "[READY] the count %d\n", count);
 
 	while (*working && tmp != NULL)
 	{
@@ -90,31 +90,31 @@ int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working,
 			pos = (tmp->prev->ts - list->ts) / 48 / 20 + 1;
 			JANUS_LOG(LOG_WARN, "[FILL] pos: %06" SCNu64 ", writing silences (count=%d)\n", pos, silence_count);
 			int i = 0;
-			int ignoring = 0;
+			// int ignoring = 0;
 			for (i = 0; i < silence_count; i++)
 			{
 				pos = (tmp->prev->ts - list->ts) / 48 / 20 + i + 1;
 
 				JANUS_LOG(LOG_WARN, "[>>] pos: %06" SCNu64 "\n", pos);
 
-				if (pos > count)
-				{
-					JANUS_LOG(LOG_WARN, "[BREAKING SILENCE]\n");
-					break;
-				}
+				// if (pos > count)
+				// {
+				// 	JANUS_LOG(LOG_WARN, "[BREAKING SILENCE]\n");
+				// 	break;
+				// }
 
-				if (pos <= count)
-				{
-					op->granulepos = 960 * (pos); /* FIXME: get this from the toc byte */
-					ogg_stream_packetin(stream, op);
-					ogg_write();
-				}
-				else
-				{
-					ignoring++;
-				}
+				// if (pos <= count)
+				// {
+				op->granulepos = 960 * (pos); /* FIXME: get this from the toc byte */
+				ogg_stream_packetin(stream, op);
+				ogg_write();
+				// }
+				// else
+				// {
+				// 	ignoring++;
+				// }
 			}
-			JANUS_LOG(LOG_WARN, "[IGNORING SILENCE] counted %d\n", ignoring);
+			// JANUS_LOG(LOG_WARN, "[IGNORING SILENCE] counted %d\n", ignoring);
 			ogg_flush();
 			g_free(op);
 		}

@@ -1252,7 +1252,7 @@ int main(int argc, char *argv[])
 	{
 		if (opus)
 		{
-			if (janus_pp_opus_process(file, list, &working, count) < 0)
+			if (janus_pp_opus_process(file, list, &working) < 0)
 			{
 				JANUS_LOG(LOG_ERR, "Error processing Opus RTP frames...\n");
 			}
