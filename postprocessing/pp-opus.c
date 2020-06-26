@@ -65,7 +65,7 @@ int janus_pp_opus_create(char *destination, char *metadata)
 	return 0;
 }
 
-int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working)
+int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working, int *count)
 {
 	if (!file || !list || !working)
 		return -1;
@@ -74,12 +74,6 @@ int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working)
 	int bytes = 0, len = 0, steps = 0, last_seq = 0;
 	uint64_t pos = 0;
 	uint8_t *buffer = g_malloc0(1500);
-
-	int count = 0;
-	while (tmp)
-	{
-		count++;
-	}
 
 	JANUS_LOG(LOG_WARN, "[READY] the count %d\n", count);
 
