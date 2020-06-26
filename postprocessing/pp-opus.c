@@ -26,7 +26,6 @@
 #include "../debug.h"
 #include "../version.h"
 
-
 /* OGG/Opus helpers */
 FILE *ogg_file = NULL;
 ogg_stream_state *stream = NULL;
@@ -40,15 +39,17 @@ void op_free(ogg_packet *op);
 int ogg_write(void);
 int ogg_flush(void);
 
-
-int janus_pp_opus_create(char *destination, char *metadata) {
+int janus_pp_opus_create(char *destination, char *metadata)
+{
 	stream = g_malloc0(sizeof(ogg_stream_state));
-	if(ogg_stream_init(stream, rand()) < 0) {
+	if (ogg_stream_init(stream, rand()) < 0)
+	{
 		JANUS_LOG(LOG_ERR, "Couldn't initialize Ogg stream state\n");
 		return -1;
 	}
 	ogg_file = fopen(destination, "wb");
-	if(ogg_file == NULL) {
+	if (ogg_file == NULL)
+	{
 		JANUS_LOG(LOG_ERR, "Couldn't open output file\n");
 		return -1;
 	}
@@ -64,70 +65,81 @@ int janus_pp_opus_create(char *destination, char *metadata) {
 	return 0;
 }
 
-int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working) {
-	if(!file || !list || !working)
+int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working)
+{
+	if (!file || !list || !working)
 		return -1;
 	janus_pp_frame_packet *tmp = list;
 	long int offset = 0;
 	int bytes = 0, len = 0, steps = 0, last_seq = 0;
 	uint64_t pos = 0;
 	uint8_t *buffer = g_malloc0(1500);
-	while(*working && tmp != NULL) {
-		if(tmp->prev != NULL && ((tmp->ts - tmp->prev->ts)/48/20 > 1)) {
-			JANUS_LOG(LOG_WARN, "Lost a packet here? (got seq %"SCNu16" after %"SCNu16", time ~%"SCNu64"s)\n",
-				tmp->seq, tmp->prev->seq, (tmp->ts-list->ts)/48000);
+	while (*working && tmp != NULL)
+	{
+		JANUS_LOG(LOG_WARN, "Pos: %06" SCNu64 "", (tmp->prev->ts - list->ts) / 48 / 20 + 1)
+		if (tmp->prev != NULL && ((tmp->ts - tmp->prev->ts) / 48 / 20 > 1))
+		{
+			JANUS_LOG(LOG_WARN, "Lost a packet here? (got seq %" SCNu16 " after %" SCNu16 ", time ~%" SCNu64 "s)\n",
+					  tmp->seq, tmp->prev->seq, (tmp->ts - list->ts) / 48000);
 			/* FIXME Write the silence packet N times to fill in the gaps */
 			ogg_packet *op = op_from_pkt((const unsigned char *)opus_silence, sizeof(opus_silence));
 			/* use ts differ to insert silence packet */
-			int silence_count = (tmp->ts - tmp->prev->ts)/48/20 - 1;
+			int silence_count = (tmp->ts - tmp->prev->ts) / 48 / 20 - 1;
 			pos = (tmp->prev->ts - list->ts) / 48 / 20 + 1;
-			JANUS_LOG(LOG_WARN, "[FILL] pos: %06"SCNu64", writing silences (count=%d)\n", pos, silence_count);
-			int i=0;
-			for(i=0; i<silence_count; i++) {
+			JANUS_LOG(LOG_WARN, "[FILL] pos: %06" SCNu64 "", pos)
+			JANUS_LOG(LOG_WARN, "[FILL] pos: %06" SCNu64 ", writing silences (count=%d)\n", pos, silence_count);
+			int i = 0;
+			for (i = 0; i < silence_count; i++)
+			{
 				pos = (tmp->prev->ts - list->ts) / 48 / 20 + i + 1;
-				op->granulepos = 960*(pos); /* FIXME: get this from the toc byte */
+				op->granulepos = 960 * (pos); /* FIXME: get this from the toc byte */
 				ogg_stream_packetin(stream, op);
 				ogg_write();
 			}
 			ogg_flush();
 			g_free(op);
 		}
-		if(tmp->drop) {
+		if (tmp->drop)
+		{
 			/* We marked this packet as one to drop, before */
-			JANUS_LOG(LOG_WARN, "Dropping previously marked audio packet (time ~%"SCNu64"s)\n", (tmp->ts-list->ts)/48000);
+			JANUS_LOG(LOG_WARN, "Dropping previously marked audio packet (time ~%" SCNu64 "s)\n", (tmp->ts - list->ts) / 48000);
 			tmp = tmp->next;
 			continue;
 		}
-		if(tmp->audiolevel != -1) {
+		if (tmp->audiolevel != -1)
+		{
 			JANUS_LOG(LOG_VERB, "Audio level: %d dB\n", tmp->audiolevel);
 		}
 		guint16 diff = tmp->prev == NULL ? 1 : (tmp->seq - tmp->prev->seq);
 		len = 0;
 		/* RTP payload */
-		offset = tmp->offset+12+tmp->skip;
+		offset = tmp->offset + 12 + tmp->skip;
 		fseek(file, offset, SEEK_SET);
-		len = tmp->len-12-tmp->skip;
-		if(len < 1) {
+		len = tmp->len - 12 - tmp->skip;
+		if (len < 1)
+		{
 			tmp = tmp->next;
 			continue;
 		}
 		bytes = fread(buffer, sizeof(char), len, file);
-		if(bytes != len) {
+		if (bytes != len)
+		{
 			JANUS_LOG(LOG_WARN, "Didn't manage to read all the bytes we needed (%d < %d)...\n", bytes, len);
 			tmp = tmp->next;
 			continue;
 		}
-		if(last_seq == 0)
+		if (last_seq == 0)
 			last_seq = tmp->seq;
-		if(tmp->seq < last_seq) {
+		if (tmp->seq < last_seq)
+		{
 			last_seq = tmp->seq;
 			steps++;
 		}
 		ogg_packet *op = op_from_pkt((const unsigned char *)buffer, bytes);
 		pos = (tmp->ts - list->ts) / 48 / 20 + 1;
-		JANUS_LOG(LOG_VERB, "pos: %06"SCNu64", writing %d bytes out of %d (seq=%"SCNu16", step=%"SCNu16", ts=%"SCNu64", time=%"SCNu64"s)\n",
-			pos, bytes, tmp->len, tmp->seq, diff, tmp->ts, (tmp->ts-list->ts)/48000);
-		op->granulepos = 960*(pos); /* FIXME: get this from the toc byte */
+		JANUS_LOG(LOG_VERB, "pos: %06" SCNu64 ", writing %d bytes out of %d (seq=%" SCNu16 ", step=%" SCNu16 ", ts=%" SCNu64 ", time=%" SCNu64 "s)\n",
+				  pos, bytes, tmp->len, tmp->seq, diff, tmp->ts, (tmp->ts - list->ts) / 48000);
+		op->granulepos = 960 * (pos); /* FIXME: get this from the toc byte */
 		ogg_stream_packetin(stream, op);
 		g_free(op);
 		ogg_write();
@@ -138,46 +150,48 @@ int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working)
 	return 0;
 }
 
-void janus_pp_opus_close(void) {
+void janus_pp_opus_close(void)
+{
 	ogg_flush();
-	if(ogg_file)
+	if (ogg_file)
 		fclose(ogg_file);
 	ogg_file = NULL;
-	if(stream)
+	if (stream)
 		ogg_stream_destroy(stream);
 	stream = NULL;
 }
 
-
 /* OGG/Opus helpers */
 /* Write a little-endian 32 bit int to memory */
-void le32(unsigned char *p, int v) {
+void le32(unsigned char *p, int v)
+{
 	p[0] = v & 0xff;
 	p[1] = (v >> 8) & 0xff;
 	p[2] = (v >> 16) & 0xff;
 	p[3] = (v >> 24) & 0xff;
 }
 
-
 /* Write a little-endian 16 bit int to memory */
-void le16(unsigned char *p, int v) {
+void le16(unsigned char *p, int v)
+{
 	p[0] = v & 0xff;
 	p[1] = (v >> 8) & 0xff;
 }
 
 /* Manufacture a generic OpusHead packet */
-ogg_packet *op_opushead(void) {
+ogg_packet *op_opushead(void)
+{
 	int size = 19;
 	unsigned char *data = g_malloc(size);
 	ogg_packet *op = g_malloc(sizeof(*op));
 
-	memcpy(data, "OpusHead", 8);  /* identifier */
-	data[8] = 1;                  /* version */
-	data[9] = 2;                  /* channels */
-	le16(data+10, 0);             /* pre-skip */
-	le32(data + 12, 48000);       /* original sample rate */
-	le16(data + 16, 0);           /* gain */
-	data[18] = 0;                 /* channel mapping family */
+	memcpy(data, "OpusHead", 8); /* identifier */
+	data[8] = 1;				 /* version */
+	data[9] = 2;				 /* channels */
+	le16(data + 10, 0);			 /* pre-skip */
+	le32(data + 12, 48000);		 /* original sample rate */
+	le16(data + 16, 0);			 /* gain */
+	data[18] = 0;				 /* channel mapping family */
 
 	op->packet = data;
 	op->bytes = size;
@@ -190,15 +204,16 @@ ogg_packet *op_opushead(void) {
 }
 
 /* Manufacture a generic OpusTags packet */
-ogg_packet *op_opustags(char *metadata) {
+ogg_packet *op_opustags(char *metadata)
+{
 	const char *identifier = "OpusTags";
 	const char *desc = "DESCRIPTION=";
 	char vendor[256];
 	g_snprintf(vendor, sizeof(vendor), "Janus post-processor %s", janus_version_string);
 	int size = strlen(identifier) + 4 + strlen(vendor) + 4;
 	int dlen = strlen(desc), mlen = metadata ? strlen(metadata) : 0;
-	if(mlen > 0)
-		size += (4+dlen+mlen);
+	if (mlen > 0)
+		size += (4 + dlen + mlen);
 	unsigned char *data = g_malloc(size);
 	ogg_packet *op = g_malloc(sizeof(*op));
 
@@ -208,9 +223,10 @@ ogg_packet *op_opustags(char *metadata) {
 	memcpy(data + 12, vendor, strlen(vendor));
 	le32(data + 12 + strlen(vendor), mlen > 0 ? 1 : 0);
 	/* Check if we have metadata to write down: we'll use the "DESCRIPTION" tag */
-	if(metadata && strlen(metadata) > 0) {
+	if (metadata && strlen(metadata) > 0)
+	{
 		/* Add a single comment */
-		le32(data + 12 + strlen(vendor) + 4, dlen+mlen);
+		le32(data + 12 + strlen(vendor) + 4, dlen + mlen);
 		memcpy(data + 12 + strlen(vendor) + 8, desc, dlen);
 		memcpy(data + 12 + strlen(vendor) + 8 + dlen, metadata, mlen);
 	}
@@ -226,7 +242,8 @@ ogg_packet *op_opustags(char *metadata) {
 }
 
 /* Allocate an ogg_packet */
-ogg_packet *op_from_pkt(const unsigned char *pkt, int len) {
+ogg_packet *op_from_pkt(const unsigned char *pkt, int len)
+{
 	ogg_packet *op = g_malloc(sizeof(*op));
 
 	op->packet = (unsigned char *)pkt;
@@ -240,9 +257,12 @@ ogg_packet *op_from_pkt(const unsigned char *pkt, int len) {
 }
 
 /* Free a packet and its contents */
-void op_free(ogg_packet *op) {
-	if(op) {
-		if(op->packet) {
+void op_free(ogg_packet *op)
+{
+	if (op)
+	{
+		if (op->packet)
+		{
 			g_free(op->packet);
 		}
 		g_free(op);
@@ -250,22 +270,27 @@ void op_free(ogg_packet *op) {
 }
 
 /* Write out available ogg pages */
-int ogg_write(void) {
+int ogg_write(void)
+{
 	ogg_page page;
 	size_t written;
 
-	if(!stream || !ogg_file) {
+	if (!stream || !ogg_file)
+	{
 		return -1;
 	}
 
-	while (ogg_stream_pageout(stream, &page)) {
+	while (ogg_stream_pageout(stream, &page))
+	{
 		written = fwrite(page.header, 1, page.header_len, ogg_file);
-		if(written != (size_t)page.header_len) {
+		if (written != (size_t)page.header_len)
+		{
 			JANUS_LOG(LOG_ERR, "Error writing Ogg page header\n");
 			return -2;
 		}
 		written = fwrite(page.body, 1, page.body_len, ogg_file);
-		if(written != (size_t)page.body_len) {
+		if (written != (size_t)page.body_len)
+		{
 			JANUS_LOG(LOG_ERR, "Error writing Ogg page body\n");
 			return -3;
 		}
@@ -274,22 +299,27 @@ int ogg_write(void) {
 }
 
 /* Flush remaining ogg data */
-int ogg_flush(void) {
+int ogg_flush(void)
+{
 	ogg_page page;
 	size_t written;
 
-	if(!stream || !ogg_file) {
+	if (!stream || !ogg_file)
+	{
 		return -1;
 	}
 
-	while (ogg_stream_flush(stream, &page)) {
+	while (ogg_stream_flush(stream, &page))
+	{
 		written = fwrite(page.header, 1, page.header_len, ogg_file);
-		if(written != (size_t)page.header_len) {
+		if (written != (size_t)page.header_len)
+		{
 			JANUS_LOG(LOG_ERR, "Error writing Ogg page header\n");
 			return -2;
 		}
 		written = fwrite(page.body, 1, page.body_len, ogg_file);
-		if(written != (size_t)page.body_len) {
+		if (written != (size_t)page.body_len)
+		{
 			JANUS_LOG(LOG_ERR, "Error writing Ogg page body\n");
 			return -3;
 		}
