@@ -64,7 +64,7 @@ int janus_pp_opus_create(char *destination, char *metadata) {
 	return 0;
 }
 
-int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working, uint32_t count) {
+int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working) {
 	if(!file || !list || !working)
 		return -1;
 	janus_pp_frame_packet *tmp = list;
@@ -85,19 +85,19 @@ int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working,
 			int i=0;
 			for(i=0; i<silence_count; i++) {
 				pos = (tmp->prev->ts - list->ts) / 48 / 20 + i + 1;
-				uint64_t nextPos = (tmp->next->ts - list->ts) / 48 / 20 + 1;
+				uint64_t nextPos = (tmp->next->ts - list->ts) / 48 / 20;
 					
-				JANUS_LOG(LOG_WARN, "[SKIP] pos: %06" SCNu64 ", next position\n", nextPos);
+				JANUS_LOG(LOG_WARN, "[NEXT] pos: %06" SCNu64 ", next position\n", nextPos);
 				
-// 				if(pos > count) {
-					JANUS_LOG(LOG_WARN, "[SKIP] pos: %06" SCNu64 ", skipping silence from position\n", pos);
-// 					break;
-// 				}
-// 				op->granulepos = 960*(pos); /* FIXME: get this from the toc byte */
-// 				ogg_stream_packetin(stream, op);
-// 				ogg_write();
+				if(pos >= nextPos) {
+					JANUS_LOG(LOG_WARN, "[SKIP] pos: %06" SCNu64 ", skipping remaining silence\n", pos);
+					break;
+				}
+				op->granulepos = 960*(pos); /* FIXME: get this from the toc byte */
+				ogg_stream_packetin(stream, op);
+				ogg_write();
 			}
-// 			ogg_flush();
+			ogg_flush();
 			g_free(op);
 		}
 		if(tmp->drop) {
