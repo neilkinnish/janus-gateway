@@ -85,7 +85,7 @@ int janus_pp_opus_process(FILE *file, janus_pp_frame_packet *list, int *working,
 			int i=0;
 			for(i=0; i<silence_count; i++) {
 				pos = (tmp->prev->ts - list->ts) / 48 / 20 + i + 1;
-				unint64_t nextPos = (tmp->next->ts - list->ts) / 48 / 20 + 1
+				unint64_t nextPos = (tmp->next->ts - list->ts) / 48 / 20 + 1;
 					
 				JANUS_LOG(LOG_WARN, "[SKIP] pos: %06" SCNu64 ", next position\n", nextPos);
 				
