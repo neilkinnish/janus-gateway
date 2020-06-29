@@ -215,8 +215,8 @@ int most_frequent_element(int arr[], int n) {
 
 int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean vp8) {
 	
-	int size = 0;
-	int capacity = 2;
+	int size_w = 0, size_h = 0;
+	int capacity_w = 2, capacity_h = 2;
 	int* max_width_arr = malloc(2 * sizeof(int));
 	int* max_height_arr = malloc(2 * sizeof(int));
 
@@ -321,10 +321,8 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 						int vp8h = swap2(*(unsigned short*)(c+5))&0x3fff;
 						int vp8hs = swap2(*(unsigned short*)(c+5))>>14;
 						JANUS_LOG(LOG_VERB, "(seq=%"SCNu16", ts=%"SCNu64") Key frame: %dx%d (scale=%dx%d)\n", tmp->seq, tmp->ts, vp8w, vp8h, vp8ws, vp8hs);
-						push(max_width_arr, tmp_index, vp8w, &size, &capacity);
-						push(max_height_arr, tmp_index, vp8h, &size, &capacity);
-// 						max_width_arr[tmp_index] = vp8w;
-// 						max_height_arr[tmp_index] = vp8h;
+						push(max_width_arr, tmp_index, vp8w, &size_w, &capacity_w);
+						push(max_height_arr, tmp_index, vp8h, &size_h, &capacity_h);
 						tmp_index++;
 					}
 				}
@@ -396,10 +394,8 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 						uint16_t *h = (uint16_t *)buffer;
 						int height = ntohs(*h);
 						buffer += 2;
-						push(max_width_arr, tmp_index, width, &size, &capacity);
-						push(max_height_arr, tmp_index, height, &size, &capacity);
-// 						max_width_arr[tmp_index] = width;
-// 						max_height_arr[tmp_index] = height;
+						push(max_width_arr, tmp_index, width, &size_w, &capacity_w);
+						push(max_height_arr, tmp_index, height, &size_h, &capacity_h);
 						tmp_index++;
 					}
 				}
