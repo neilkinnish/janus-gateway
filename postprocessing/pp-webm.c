@@ -65,8 +65,8 @@ static AVStream *vStream;
 static AVCodecContext *vEncoder;
 #endif
 static int max_width = 0, max_height = 0, fps = 0;
-static int max_width_arr[];
-static int max_height_arr[];
+static int max_width_arr[0];
+static int max_height_arr[0];
 
 int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8) {
 	if(destination == NULL)
@@ -171,7 +171,7 @@ int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8) {
 }
 
 int most_frequent_element(int arr[], int n) { 
-    int max_count = 1, res = arr[0], curr_count = 1; 
+    uint max_count = 1, res = arr[0], curr_count = 1, i = 0;
     for(i = 1; i < n; i++) { 
         if(arr[i] == arr[i - 1]) {            
 		curr_count++; 
