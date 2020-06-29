@@ -7,6 +7,12 @@
  * \ingroup postprocessing
  * \ref postprocessing
  */
+
+static typedef struct {
+	int *array;
+	size_t used;
+	size_t size;
+} ratio_array;
  
 static void init_array(Array *a, size_t initialSize) {
 	a->array = (int *)malloc(initialSize * sizeof(int));
