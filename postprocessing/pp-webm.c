@@ -171,7 +171,7 @@ int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8) {
 }
 
 int most_frequent_element(int arr[], int n) { 
-    uint max_count = 1, res = arr[0], curr_count = 1, i = 0;
+    int max_count = 1, res = arr[0], curr_count = 1, i = 0;
     for(i = 1; i < n; i++) { 
         if(arr[i] == arr[i - 1]) {            
 		curr_count++; 
