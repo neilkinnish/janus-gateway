@@ -217,8 +217,8 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 	
 	int size = 0;
 	int capacity = 2;
-	int* max_width_arr = malloc(INITIAL_CAPACITY * sizeof(int));
-	int* max_height_arr = malloc(INITIAL_CAPACITY * sizeof(int));
+	int* max_width_arr = malloc(2 * sizeof(int));
+	int* max_height_arr = malloc(2 * sizeof(int));
 
 	// int max_width_arr[0];
 	// int max_height_arr[0];
