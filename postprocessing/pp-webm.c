@@ -65,6 +65,8 @@ static AVStream *vStream;
 static AVCodecContext *vEncoder;
 #endif
 static int max_width = 0, max_height = 0, fps = 0;
+static int max_width_arr[]
+static int max_height_arr[]
 
 int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8) {
 	if(destination == NULL)
@@ -376,7 +378,7 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 	max_width =  most_frequent(max_width_arr, max_width_n);
 	
 	int max_height_n = sizeof(max_height_arr) / sizeof(max_height_arr[0]); 
-	max_height =  most_frequent(max_height_arr);
+	max_height =  most_frequent(max_height_arr, max_height_n);
 	
 	int mean_ts = min_ts_diff;	/* FIXME: was an actual mean, (max_ts_diff+min_ts_diff)/2; */
 	fps = (90000/(mean_ts > 0 ? mean_ts : 30));
