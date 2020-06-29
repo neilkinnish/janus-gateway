@@ -18,6 +18,7 @@
 
 /* WebM stuff */
 int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8);
+int most_frequent_element(int arr[], int n);
 int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean vp8);
 int janus_pp_webm_process(FILE *file, janus_pp_frame_packet *list, gboolean vp8, int *working);
 void janus_pp_webm_close(void);
