@@ -169,65 +169,65 @@ int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8) {
 }
 
 typedef struct {
-  int *array;
-  size_t used;
-  size_t size;
+	int *array;
+	size_t used;
+	size_t size;
 } Array;
 
 static void initArray(Array *a, size_t initialSize) {
-  a->array = (int *)malloc(initialSize * sizeof(int));
-  a->used = 0;
-  a->size = initialSize;
+	a->array = (int *)malloc(initialSize * sizeof(int));
+	a->used = 0;
+	a->size = initialSize;
 }
 
 static void insertArray(Array *a, int element) {
-  if (a->used == a->size) {
-    a->size *= 2;
-    a->array = (int *)realloc(a->array, a->size * sizeof(int));
-  }
-  a->array[a->used++] = element;
+	if (a->used == a->size) {
+		a->size *= 2;
+		a->array = (int *)realloc(a->array, a->size * sizeof(int));
+	}
+	a->array[a->used++] = element;
 }
 
 static void freeArray(Array *a) {
-  free(a->array);
-  a->array = NULL;
-  a->used = a->size = 0;
+	free(a->array);
+	a->array = NULL;
+	a->used = a->size = 0;
 }
 
-static void sort(int a[], int n) { 
-  int i = 0;
+static void sort(int arr[], int n) { 
+  	int i = 0, j = 0;
 	for(i = 0; i < n; i++) {
-		for(int j = 0; j < n; j++) {
-			if(a[j] < a[i]) {
-				int tmp = a[i];
-				a[i] = a[j];
-				a[j] = tmp;
+		for(j = 0; j < n; j++) {
+			if(arr[j] < arr[i]) {
+				int tmp = arr[i];
+				arr[i] = arr[j];
+				arr[j] = tmp;
 			}
 		}
 	}
 }
 
 int most_frequent_element(int arr[], int n) { 
-  int max_count = 1, res = arr[0], curr_count = 1, i = 0;
+	int max_count = 1, res = arr[0], curr_count = 1, i = 0;
 
-  for(i = 1; i < n; i++) { 
-    if(arr[i] == arr[i - 1]) { 
-      curr_count++; 
-    } else { 
-      if(curr_count > max_count) { 
-        max_count = curr_count; 
-        res = arr[i - 1]; 
-      } 
-      curr_count = 1; 
-    } 
-  } 
+	for(i = 1; i < n; i++) { 
+		if(arr[i] == arr[i - 1]) { 
+			curr_count++; 
+		} else { 
+			if(curr_count > max_count) { 
+				max_count = curr_count; 
+				res = arr[i - 1]; 
+			} 
+			curr_count = 1; 
+		} 
+	} 
 
-  if(curr_count > max_count) { 
-    max_count = curr_count; 
-    res = arr[n - 1]; 
-  } 
-  
-  return res; 
+	if(curr_count > max_count) { 
+		max_count = curr_count; 
+		res = arr[n - 1]; 
+	} 
+
+	return res; 
 }
 
 int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean vp8) {
