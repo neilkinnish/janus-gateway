@@ -7,6 +7,7 @@
  * \ingroup postprocessing
  * \ref postprocessing
  */
+#include <stdlib.h>
 
 typedef struct janus_config_container {
 	int *array;
