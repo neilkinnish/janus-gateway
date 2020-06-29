@@ -14,13 +14,13 @@ static typedef struct {
 	size_t size;
 } ratio_array;
  
-static void init_array(Array *a, size_t initialSize) {
+static void init_array(ratio_array *a, size_t initialSize) {
 	a->array = (int *)malloc(initialSize * sizeof(int));
 	a->used = 0;
 	a->size = initialSize;
 }
 
-static void insert_array(Array *a, int element) {
+static void insert_array(ratio_array *a, int element) {
 	if (a->used == a->size) {
 		a->size *= 2;
 		a->array = (int *)realloc(a->array, a->size * sizeof(int));
@@ -28,7 +28,7 @@ static void insert_array(Array *a, int element) {
 	a->array[a->used++] = element;
 }
 
-static void free_array(Array *a) {
+static void free_array(ratio_array *a) {
 	free(a->array);
 	a->array = NULL;
 	a->used = a->size = 0;
