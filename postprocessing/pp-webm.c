@@ -374,11 +374,8 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 		tmp = tmp->next;
 	}
 		
-	int max_width_n = sizeof(max_width_arr) / sizeof(max_width_arr[0]); 
-	max_width = most_frequent_element(max_width_arr, max_width_n);
-	
-	int max_height_n = sizeof(max_height_arr) / sizeof(max_height_arr[0]); 
-	max_height = most_frequent_element(max_height_arr, max_height_n);
+	max_width = most_frequent_element(max_width_arr, tmp_index);
+	max_height = most_frequent_element(max_height_arr, tmp_index);
 	
 	int mean_ts = min_ts_diff;	/* FIXME: was an actual mean, (max_ts_diff+min_ts_diff)/2; */
 	fps = (90000/(mean_ts > 0 ? mean_ts : 30));
