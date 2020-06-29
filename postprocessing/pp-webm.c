@@ -18,7 +18,6 @@
 #include <inttypes.h>
 #include <string.h>
 #include <stdlib.h>
-#include <vector>
 
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -171,19 +170,26 @@ int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8) {
 	return 0;
 }
 
-int most_frequent_element(std::vector<int> const& v) {
-    std::map<int, int> frequencyMap;
-    int maxFrequency = 0;
-    int mostFrequentElement = 0;
-    for(int x : v) {
-        int f = ++frequencyMap[x];
-        if(f > maxFrequency) {
-            maxFrequency = f;
-            mostFrequentElement = x;
-        }
-    }
- 
-    return mostFrequentElement;
+int most_frequent(int arr[], int n) { 
+    int max_count = 1, res = arr[0], curr_count = 1; 
+    for(int i = 1; i < n; i++) { 
+        if(arr[i] == arr[i - 1]) {            
+		curr_count++; 
+	}else{ 
+            if(curr_count > max_count) { 
+                max_count = curr_count; 
+                res = arr[i - 1]; 
+            } 
+            curr_count = 1; 
+        } 
+    } 
+
+    if(curr_count > max_count) { 
+        max_count = curr_count; 
+        res = arr[n - 1]; 
+    } 
+  
+    return res; 
 }
 
 int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean vp8) {
@@ -193,6 +199,7 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 	janus_pp_frame_packet *tmp = list;
 	int bytes = 0, min_ts_diff = 0, max_ts_diff = 0;
 	int rotation = -1;
+	int tmp_index = 0;
 	char prebuffer[1500];
 	memset(prebuffer, 0, 1500);
 	
@@ -284,8 +291,9 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 						int vp8h = swap2(*(unsigned short*)(c+5))&0x3fff;
 						int vp8hs = swap2(*(unsigned short*)(c+5))>>14;
 						JANUS_LOG(LOG_VERB, "(seq=%"SCNu16", ts=%"SCNu64") Key frame: %dx%d (scale=%dx%d)\n", tmp->seq, tmp->ts, vp8w, vp8h, vp8ws, vp8hs);
-						max_width_arr.push_back(vp8w);
-						max_height_arr.push_back(vp8h);
+						max_width_arr[tmp_index] = vp8w;
+						max_height_arr[tmp_index] = vp8h;
+						tmp_index++;
 					}
 				}
 			}
@@ -356,8 +364,9 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 						uint16_t *h = (uint16_t *)buffer;
 						int height = ntohs(*h);
 						buffer += 2;
-						max_width_arr.push_back(width);
-						max_height_arr.push_back(height);
+						max_width_arr[tmp_index] = width;
+						max_height_arr[tmp_index] = height;
+						tmp_index++;
 					}
 				}
 			}
@@ -365,8 +374,11 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 		tmp = tmp->next;
 	}
 		
-	max_width =  most_frequent_element(max_width_arr);
-	max_height =  most_frequent_element(max_height_arr);
+	int max_width_n = sizeof(max_width_arr) / sizeof(max_width_arr[0]); 
+	max_width =  most_frequent(max_width_arr, max_width_n);
+	
+	int max_height_n = sizeof(max_height_arr) / sizeof(max_height_arr[0]); 
+	max_height =  most_frequent(max_height_arr);
 	
 	int mean_ts = min_ts_diff;	/* FIXME: was an actual mean, (max_ts_diff+min_ts_diff)/2; */
 	fps = (90000/(mean_ts > 0 ? mean_ts : 30));
