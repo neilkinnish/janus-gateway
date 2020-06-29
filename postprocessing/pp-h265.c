@@ -22,6 +22,7 @@
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 
+#include "pp-utils.h"
 #include "pp-h265.h"
 #include "../debug.h"
 
@@ -252,6 +253,12 @@ static void janus_pp_h265_parse_sps(char *buffer, int *width, int *height) {
 int janus_pp_h265_preprocess(FILE *file, janus_pp_frame_packet *list) {
 	if(!file || !list)
 		return -1;
+	
+	ratio_array max_width_arr;
+	ratio_array max_height_arr;
+	init_array(&max_width_arr, 1);
+	init_array(&max_height_arr, 1);
+	
 	janus_pp_frame_packet *tmp = list;
 	int bytes = 0, min_ts_diff = 0, max_ts_diff = 0;
 	int rotation = -1;
@@ -331,10 +338,8 @@ int janus_pp_h265_preprocess(FILE *file, janus_pp_frame_packet *list) {
 			/* Parse to get width/height */
 			int width = 0, height = 0;
 			janus_pp_h265_parse_sps(prebuffer, &width, &height);
-			if(width > max_width)
-				max_width = width;
-			if(height > max_height)
-				max_height = height;
+			insert_array(&max_width_arr, width);
+			insert_array(&max_height_arr, height);
 		} else if(type == 34) {
 			/* PPS */
 			JANUS_LOG(LOG_HUGE, "[PPS] %u/%u/%u/%u\n", fbit, type, lid, tid);
@@ -358,6 +363,12 @@ int janus_pp_h265_preprocess(FILE *file, janus_pp_frame_packet *list) {
 		}
 		tmp = tmp->next;
 	}
+	sort_array_asc(max_width_arr.array, max_width_arr.used);
+	sort_array_asc(max_height_arr.array, max_height_arr.used);
+	max_width = most_frequent_element(max_width_arr.array, max_width_arr.used);
+	max_height = most_frequent_element(max_height_arr.array, max_height_arr.used);
+  	free_array(&max_width_arr);
+	free_array(&max_height_arr);
 	int mean_ts = min_ts_diff;	/* FIXME: was an actual mean, (max_ts_diff+min_ts_diff)/2; */
 	fps = (90000/(mean_ts > 0 ? mean_ts : 30));
 	JANUS_LOG(LOG_INFO, "  -- %dx%d (fps [%d,%d] ~ %d)\n", max_width, max_height, min_ts_diff, max_ts_diff, fps);
