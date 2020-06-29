@@ -174,13 +174,13 @@ typedef struct {
   size_t size;
 } Array;
 
-void initArray(Array *a, size_t initialSize) {
+static void initArray(Array *a, size_t initialSize) {
   a->array = (int *)malloc(initialSize * sizeof(int));
   a->used = 0;
   a->size = initialSize;
 }
 
-void insertArray(Array *a, int element) {
+static void insertArray(Array *a, int element) {
   if (a->used == a->size) {
     a->size *= 2;
     a->array = (int *)realloc(a->array, a->size * sizeof(int));
@@ -188,13 +188,13 @@ void insertArray(Array *a, int element) {
   a->array[a->used++] = element;
 }
 
-void freeArray(Array *a) {
+static void freeArray(Array *a) {
   free(a->array);
   a->array = NULL;
   a->used = a->size = 0;
 }
 
-void sort(int a[], int n) { 
+static void sort(int a[], int n) { 
   int i = 0;
 	for(i = 0; i < n; i++) {
 		for(int j = 0; j < n; j++) {
