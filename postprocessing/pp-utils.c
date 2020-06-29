@@ -7,28 +7,27 @@
  * \ingroup postprocessing
  * \ref postprocessing
  */
- 
-#include <stdlib.h>
+
 #include "pp-utils.h"
  
-void init_array(ratio_array *a, size_t initialSize) {
-	a->array = (int *)malloc(initialSize * sizeof(int));
-	a->used = 0;
-	a->size = initialSize;
+void init_array(ratio_array *arr, size_t initialSize) {
+	arr->array = (int *)malloc(initialSize * sizeof(int));
+	arr->used = 0;
+	arr->size = initialSize;
 }
 
-void insert_array(ratio_array *a, int element) {
-	if (a->used == a->size) {
-		a->size *= 2;
-		a->array = (int *)realloc(a->array, a->size * sizeof(int));
+void insert_array(ratio_array *arr, int element) {
+	if (arr->used == arr->size) {
+		arr->size *= 2;
+		arr->array = (int *)realloc(arr->array, arr->size * sizeof(int));
 	}
-	a->array[a->used++] = element;
+	arr->array[arr->used++] = element;
 }
 
-void free_array(ratio_array *a) {
-	free(a->array);
-	a->array = NULL;
-	a->used = a->size = 0;
+void free_array(ratio_array *arr) {
+	free(arr->array);
+	arr->array = NULL;
+	arr->used = arr->size = 0;
 }
 
 void sort_array_asc(int arr[], int n) { 
