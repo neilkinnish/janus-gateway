@@ -8,7 +8,7 @@
  * \ref postprocessing
  */
  
-#include "utils.h"
+#include "pp-utils.h"
  
 void init_array(ratio_array *a, size_t initialSize) {
 	a->array = (int *)malloc(initialSize * sizeof(int));
