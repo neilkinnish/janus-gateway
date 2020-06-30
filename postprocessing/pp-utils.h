@@ -22,7 +22,6 @@ typedef struct janus_config_container {
 void init_array(ratio_array *arr, size_t initialSize);
 void insert_array(ratio_array *arr, int element);
 void free_array(ratio_array *arr);
-void sort_array_asc(int arr[], int n);
 int most_frequent_element(int arr[], int n);
 
 #endif
