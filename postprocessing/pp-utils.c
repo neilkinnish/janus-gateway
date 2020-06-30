@@ -30,8 +30,10 @@ void free_array(ratio_array *arr) {
 	arr->used = arr->size = 0;
 }
 
-void sort_array_asc(int arr[], int n) { 
-  	int i = 0, j = 0;
+int most_frequent_element(int arr[], int n) { 
+	int max_count = 1, res = arr[0], curr_count = 1, i = 0, j = 0;
+	
+	// Sort the array ascending
 	for(i = 0; i < n; i++) {
 		for(j = 0; j < n; j++) {
 			if(arr[j] < arr[i]) {
@@ -41,10 +43,6 @@ void sort_array_asc(int arr[], int n) {
 			}
 		}
 	}
-}
-
-int most_frequent_element(int arr[], int n) { 
-	int max_count = 1, res = arr[0], curr_count = 1, i = 0;
 
 	for(i = 1; i < n; i++) { 
 		if(arr[i] == arr[i - 1]) { 
