@@ -363,8 +363,6 @@ int janus_pp_h265_preprocess(FILE *file, janus_pp_frame_packet *list) {
 		}
 		tmp = tmp->next;
 	}
-	sort_array_asc(max_width_arr.array, max_width_arr.used);
-	sort_array_asc(max_height_arr.array, max_height_arr.used);
 	max_width = most_frequent_element(max_width_arr.array, max_width_arr.used);
 	max_height = most_frequent_element(max_height_arr.array, max_height_arr.used);
   	free_array(&max_width_arr);
