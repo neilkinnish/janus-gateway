@@ -20,20 +20,20 @@ void free_dimension_array(dimension_array *arr) {
 	arr->used = arr->size = 0;
 }
 
-dimension_item get_optimal_dimensions(dimension_array *arr, int threshold) {
+dimension_item get_optimal_dimensions(dimension_item arr[], int len, int threshold) {
 	dimension_item dimensions;
 	dimensions.width = 0;
 	dimensions.height = 0;
 	int i;
-	for(i = 0; i < arr.used; i++) {
-    		int prev = arr.array[i].seq - arr.array[i-1].seq;
-		int next = arr.array[i+1].seq - arr.array[i].seq;
+	for(i = 0; i < len; i++) {
+    		int prev = arr[i].seq - arr[i-1].seq;
+		int next = arr[i+1].seq - arr[i].seq;
     		if (prev >= threshold && next >= threshold) {
-      			if (arr.array[i].width > dimensions.width) {
-        			dimensions.width = arr.array[i].width;
+      			if (arr[i].width > dimensions.width) {
+        			dimensions.width = arr[i].width;
 			}
-			if (arr.array[i].height > dimensions.height) {
-        			dimensions.height = arr.array[i].height;
+			if (arr[i].height > dimensions.height) {
+        			dimensions.height = arr[i].height;
 			}
     		}
   	}
