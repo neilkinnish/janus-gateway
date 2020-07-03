@@ -1,19 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct size_item {
+typedef struct dimension_item {
 	int width;
 	int height;
   	int seq;
-} size_item;
+} dimension_item;
 
-typedef struct size_array {
-	size_item *array;
+typedef struct dimension_array {
+	dimension_item *array;
 	size_t used;
 	size_t size;
-} size_array;
+} dimension_array;
 
-void init_array(size_array *arr, size_t initialSize);
-void insert_array(size_array *arr, size_item element);
-void free_array(size_array *arr);
-size_item get_optimal_dimensions(size_item arr[], int threshold);
+void init_dimension_array(size_array *arr, size_t initialSize);
+void insert_dimension_array(size_array *arr, dimension_item element);
+void free_dimension_array(dimension_array *arr);
+dimension_item get_optimal_dimensions(dimension_item arr[], int threshold);
