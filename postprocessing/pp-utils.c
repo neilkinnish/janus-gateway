@@ -24,6 +24,7 @@ dimension_item get_optimal_dimensions(dimension_array *arr, int threshold) {
 	dimension_item dimensions;
 	dimensions.width = 0;
 	dimensions.height = 0;
+	int i;
 	for(i = 0; i < arr.used; i++) {
     		int prev = arr.array[i].seq - arr.array[i-1].seq;
 		int next = arr.array[i+1].seq - arr.array[i].seq;
