@@ -360,7 +360,7 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 		tmp = tmp->next;
 	}
 	
-	dimension_item dimensions = get_optimal_dimensions(dimension_arr, 10);
+	dimension_item dimensions = get_optimal_dimensions(dimension_arr.array, dimension_arr.used, 10);
 	max_width = dimensions.width;
 	max_height = dimensions.height;
 	JANUS_LOG(LOG_INFO, "Set dimensions: %dx%d\n", max_width, max_height);
