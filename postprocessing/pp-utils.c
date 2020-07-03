@@ -14,7 +14,7 @@ void insert_dimension_array(dimension_array *arr, dimension_item element) {
 	arr->array[arr->used++] = element;
 }
 
-void free_array(dimension_array *arr) {
+void free_dimension_array(dimension_array *arr) {
 	free(arr->array);
 	arr->array = NULL;
 	arr->used = arr->size = 0;
