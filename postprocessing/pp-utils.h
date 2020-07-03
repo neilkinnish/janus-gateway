@@ -16,4 +16,4 @@ typedef struct dimension_array {
 void init_dimension_array(dimension_array *arr, size_t initialSize);
 void insert_dimension_array(dimension_array *arr, dimension_item element);
 void free_dimension_array(dimension_array *arr);
-dimension_item get_optimal_dimensions(dimension_item arr[], int threshold);
+dimension_item get_optimal_dimensions(dimension_array *arr, int threshold);
