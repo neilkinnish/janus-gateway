@@ -13,7 +13,7 @@ typedef struct dimension_array {
 	size_t size;
 } dimension_array;
 
-void init_dimension_array(size_array *arr, size_t initialSize);
-void insert_dimension_array(size_array *arr, dimension_item element);
+void init_dimension_array(dimension_array *arr, size_t initialSize);
+void insert_dimension_array(dimension_array *arr, dimension_item element);
 void free_dimension_array(dimension_array *arr);
 dimension_item get_optimal_dimensions(dimension_item arr[], int threshold);
