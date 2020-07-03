@@ -22,6 +22,7 @@
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 
+#include "pp-utils.h"
 #include "pp-webm.h"
 #include "../debug.h"
 
@@ -171,6 +172,10 @@ int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8) {
 int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean vp8) {
 	if(!file || !list)
 		return -1;
+
+	dimension_array dimension_arr;
+	init_dimension_array(&dimension_arr, 1);
+	
 	janus_pp_frame_packet *tmp = list;
 	int bytes = 0, min_ts_diff = 0, max_ts_diff = 0;
 	int rotation = -1;
@@ -264,10 +269,13 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 						int vp8h = swap2(*(unsigned short*)(c+5))&0x3fff;
 						int vp8hs = swap2(*(unsigned short*)(c+5))>>14;
 						JANUS_LOG(LOG_VERB, "(seq=%"SCNu16", ts=%"SCNu64") Key frame: %dx%d (scale=%dx%d)\n", tmp->seq, tmp->ts, vp8w, vp8h, vp8ws, vp8hs);
-						if(vp8w > max_width)
-							max_width = vp8w;
-						if(vp8h > max_height)
-							max_height = vp8h;
+						
+						dimension_item dimensions;
+						dimensions.width = vp8w;
+						dimensions.height = vp8h;
+						dimensions.seq = tmp->seq;
+
+						insert_dimension_array(&dimension_arr, dimensions);
 					}
 				}
 			}
@@ -338,16 +346,25 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 						uint16_t *h = (uint16_t *)buffer;
 						int height = ntohs(*h);
 						buffer += 2;
-						if(width > max_width)
-							max_width = width;
-						if(height > max_height)
-							max_height = height;
+						
+						dimension_item dimensions;
+						dimensions.width = width;
+						dimensions.height = height;
+						dimensions.seq = tmp->seq;
+
+						insert_dimension_array(&dimension_arr, dimensions);
 					}
 				}
 			}
 		}
 		tmp = tmp->next;
 	}
+	
+	dimension_item dimensions = get_optimal_dimensions(dimension_arr.array, dimension_arr.used, 10);
+	max_width = dimensions.width;
+	max_height = dimensions.height;
+	JANUS_LOG(LOG_INFO, "Set dimensions: %dx%d\n", max_width, max_height);
+	
 	int mean_ts = min_ts_diff;	/* FIXME: was an actual mean, (max_ts_diff+min_ts_diff)/2; */
 	fps = (90000/(mean_ts > 0 ? mean_ts : 30));
 	JANUS_LOG(LOG_INFO, "  -- %dx%d (fps [%d,%d] ~ %d)\n", max_width, max_height, min_ts_diff, max_ts_diff, fps);
