@@ -25,7 +25,7 @@ size_item get_optimal_dimensions(size_array *arr, int threshold) {
 	for(i = 0; i < arr.used; i++) {
     		int prev = arr.array[i].seq - arr.array[i-1].seq;
 		int next = arr.array[i+1].seq - arr.array[i].seq;
-    		if (prev >= 10 && next >= 10) {
+    		if (prev >= threshold && next >= threshold) {
       			if (arr.array[i].width > _size.width) {
         			_size.width = arr.array[i].width;
 			}
