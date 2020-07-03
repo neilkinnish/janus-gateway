@@ -22,6 +22,7 @@
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 
+#include "pp-utils.h"
 #include "pp-h265.h"
 #include "../debug.h"
 
@@ -252,6 +253,10 @@ static void janus_pp_h265_parse_sps(char *buffer, int *width, int *height) {
 int janus_pp_h265_preprocess(FILE *file, janus_pp_frame_packet *list) {
 	if(!file || !list)
 		return -1;
+	
+	dimension_array dimension_arr;
+	init_dimension_array(&dimension_arr, 1);	
+	
 	janus_pp_frame_packet *tmp = list;
 	int bytes = 0, min_ts_diff = 0, max_ts_diff = 0;
 	int rotation = -1;
@@ -331,10 +336,13 @@ int janus_pp_h265_preprocess(FILE *file, janus_pp_frame_packet *list) {
 			/* Parse to get width/height */
 			int width = 0, height = 0;
 			janus_pp_h265_parse_sps(prebuffer, &width, &height);
-			if(width > max_width)
-				max_width = width;
-			if(height > max_height)
-				max_height = height;
+			
+			dimension_item dimensions;
+			dimensions.width = width;
+			dimensions.height = height;
+			dimensions.seq = tmp->seq;
+
+			insert_dimension_array(&dimension_arr, dimensions);
 		} else if(type == 34) {
 			/* PPS */
 			JANUS_LOG(LOG_HUGE, "[PPS] %u/%u/%u/%u\n", fbit, type, lid, tid);
@@ -358,6 +366,12 @@ int janus_pp_h265_preprocess(FILE *file, janus_pp_frame_packet *list) {
 		}
 		tmp = tmp->next;
 	}
+	
+	dimension_item dimensions = get_optimal_dimensions(dimension_arr.array, dimension_arr.used, 10);
+	max_width = dimensions.width;
+	max_height = dimensions.height;
+	JANUS_LOG(LOG_INFO, "Set dimensions: %dx%d\n", max_width, max_height);
+	
 	int mean_ts = min_ts_diff;	/* FIXME: was an actual mean, (max_ts_diff+min_ts_diff)/2; */
 	fps = (90000/(mean_ts > 0 ? mean_ts : 30));
 	JANUS_LOG(LOG_INFO, "  -- %dx%d (fps [%d,%d] ~ %d)\n", max_width, max_height, min_ts_diff, max_ts_diff, fps);
