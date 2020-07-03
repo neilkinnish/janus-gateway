@@ -173,8 +173,8 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 	if(!file || !list)
 		return -1;
 
-	size_array size_arr;
-	init_array(&size_arr, 1);
+	dimension_array dimension_arr;
+	init_dimension_array(&dimension_arr, 1);
 	
 	janus_pp_frame_packet *tmp = list;
 	int bytes = 0, min_ts_diff = 0, max_ts_diff = 0;
@@ -270,11 +270,12 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 						int vp8hs = swap2(*(unsigned short*)(c+5))>>14;
 						JANUS_LOG(LOG_VERB, "(seq=%"SCNu16", ts=%"SCNu64") Key frame: %dx%d (scale=%dx%d)\n", tmp->seq, tmp->ts, vp8w, vp8h, vp8ws, vp8hs);
 						
-						size_item _size;
-						_size.width = vp8w;
-						_size.height = vp8h;
-						_size.frame = tmp->seq;
-						insert_array(&size_arr, _size);
+						dimension_item dimensions;
+						dimensions.width = vp8w;
+						dimensions.height = vp8h;
+						dimensions.seq = tmp->seq;
+
+						insert_dimension_array(&dimension_arr, dimensions);
 					}
 				}
 			}
@@ -346,11 +347,12 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 						int height = ntohs(*h);
 						buffer += 2;
 						
-						size_item _size;
-						_size.width = width;
-						_size.height = height;
-						_size.frame = tmp->seq;
-						insert_array(&size_arr, _size);
+						dimension_item dimensions;
+						dimensions.width = width;
+						dimensions.height = height;
+						dimensions.seq = tmp->seq;
+
+						insert_dimension_array(&dimension_arr, dimensions);
 					}
 				}
 			}
@@ -358,7 +360,9 @@ int janus_pp_webm_preprocess(FILE *file, janus_pp_frame_packet *list, gboolean v
 		tmp = tmp->next;
 	}
 	
-	// --
+	dimension_item dimensions = get_optimal_dimensions(dimension_arr, 10);
+	max_width = dimensions.width;
+	max_height = dimensions.height;
 	
 	int mean_ts = min_ts_diff;	/* FIXME: was an actual mean, (max_ts_diff+min_ts_diff)/2; */
 	fps = (90000/(mean_ts > 0 ? mean_ts : 30));
