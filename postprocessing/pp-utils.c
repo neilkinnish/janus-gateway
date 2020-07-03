@@ -22,8 +22,9 @@ void free_dimension_array(dimension_array *arr) {
 
 dimension_item get_optimal_dimensions(dimension_item arr[], int len, int threshold) {
 	dimension_item dimensions;
-	dimensions.width = 0;
-	dimensions.height = 0;
+	dimensions.width = arr[0].width;
+	dimensions.height = arr[0].height;
+
 	int i;
 	for(i = 0; i < len; i++) {
     		int prev = arr[i].seq - arr[i-1].seq;
@@ -37,5 +38,6 @@ dimension_item get_optimal_dimensions(dimension_item arr[], int len, int thresho
 			}
     		}
   	}
+
 	return dimensions;
 }
