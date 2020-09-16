@@ -259,6 +259,7 @@ int janus_pp_h264_preprocess(FILE *file, janus_pp_frame_packet *list) {
 	int rotation = -1;
 	char prebuffer[1500];
 	memset(prebuffer, 0, 1500);
+	int totalFrames = 0;
 	while(tmp) {
 		if(tmp->prev != NULL && tmp->ts > tmp->prev->ts) {
 			if(tmp->ts > tmp->prev->ts) {
@@ -334,9 +335,10 @@ int janus_pp_h264_preprocess(FILE *file, janus_pp_frame_packet *list) {
 			rotation = tmp->rotation;
 			JANUS_LOG(LOG_INFO, "Video rotation: %d degrees\n", rotation);
 		}
+		totalFrames++;
 		tmp = tmp->next;
 	}
-	dimension_item dimensions = get_optimal_dimensions(dimension_arr.array, dimension_arr.used, 10);
+	dimension_item dimensions = get_optimal_dimensions(dimension_arr.array, totalFrames, dimension_arr.used, 10);
 	max_width = dimensions.width;
 	max_height = dimensions.height;
 	free_dimension_array(&dimension_arr);
