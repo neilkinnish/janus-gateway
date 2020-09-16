@@ -30,7 +30,7 @@ dimension_item get_optimal_dimensions(dimension_item arr[], int len, int totalFr
 	for (i = 0; i < len; i++) {
 		int prev = arr[i].seq - arr[i - 1].seq;
 		int next = arr[i + 1].seq - arr[i].seq;
-		if (prev >= threshold && (next >= threshold || lastFrame >= arr[i].seq) {
+		if (prev >= threshold && (next >= threshold || lastFrame >= arr[i].seq)) {
 			if (arr[i].width > dimensions.width)
 				dimensions.width = arr[i].width;
 			if (arr[i].height > dimensions.height)
