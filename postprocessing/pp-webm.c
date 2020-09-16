@@ -110,6 +110,7 @@ int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8) {
 		JANUS_LOG(LOG_ERR, "Encoder not available\n");
 		return -1;
 	}
+	JANUS_LOG(LOG_INFO, " >1 -- %dx%d\n", max_width, max_height);
 	fctx->video_codec = codec;
 	fctx->oformat->video_codec = codec->id;
 	vStream = avformat_new_stream(fctx, codec);
@@ -148,6 +149,7 @@ int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8) {
 #else
 	vStream->codec->codec_id = CODEC_ID_VP8;
 #endif
+	JANUS_LOG(LOG_INFO, " >2 -- %dx%d\n", max_width, max_height);
 	//~ vStream->codec->codec_type = CODEC_TYPE_VIDEO;
 	vStream->codec->codec_type = AVMEDIA_TYPE_VIDEO;
 	vStream->codec->time_base = (AVRational){1, fps};
