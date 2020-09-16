@@ -67,6 +67,17 @@ static AVCodecContext *vEncoder;
 #endif
 static int max_width = 0, max_height = 0, fps = 0;
 
+int roundUp(int numToRound, int multiple){
+    if (multiple == 0)
+        return numToRound;
+
+    int remainder = numToRound % multiple;
+    if (remainder == 0)
+        return numToRound;
+
+    return numToRound + multiple - remainder;
+}
+
 int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8) {
 	if(destination == NULL)
 		return -1;
@@ -110,7 +121,6 @@ int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8) {
 		JANUS_LOG(LOG_ERR, "Encoder not available\n");
 		return -1;
 	}
-	JANUS_LOG(LOG_INFO, " >1 -- %dx%d\n", max_width, max_height);
 	fctx->video_codec = codec;
 	fctx->oformat->video_codec = codec->id;
 	vStream = avformat_new_stream(fctx, codec);
@@ -118,6 +128,8 @@ int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8) {
 	vEncoder = avcodec_alloc_context3(codec);
 	vEncoder->width = max_width;
 	vEncoder->height = max_height;
+	vEncoder->coded_width = max_width;
+	vEncoder->coded_height = max_height;
 	vEncoder->time_base = (AVRational){ 1, fps };
 	vEncoder->pix_fmt = AV_PIX_FMT_YUV420P;
 	vEncoder->flags |= CODEC_FLAG_GLOBAL_HEADER;
@@ -149,7 +161,6 @@ int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8) {
 #else
 	vStream->codec->codec_id = CODEC_ID_VP8;
 #endif
-	JANUS_LOG(LOG_INFO, " >2 -- %dx%d\n", max_width, max_height);
 	//~ vStream->codec->codec_type = CODEC_TYPE_VIDEO;
 	vStream->codec->codec_type = AVMEDIA_TYPE_VIDEO;
 	vStream->codec->time_base = (AVRational){1, fps};
