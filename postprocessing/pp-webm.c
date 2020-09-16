@@ -67,17 +67,6 @@ static AVCodecContext *vEncoder;
 #endif
 static int max_width = 0, max_height = 0, fps = 0;
 
-int roundUp(int numToRound, int multiple){
-    if (multiple == 0)
-        return numToRound;
-
-    int remainder = numToRound % multiple;
-    if (remainder == 0)
-        return numToRound;
-
-    return numToRound + multiple - remainder;
-}
-
 int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8) {
 	if(destination == NULL)
 		return -1;
@@ -138,6 +127,7 @@ int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8) {
 		JANUS_LOG(LOG_ERR, "Encoder error\n");
 		return -1;
 	}
+	avcodec_set_dimensions(vEncoder, max_width, max_height;
 	avcodec_parameters_from_context(vStream->codecpar, vEncoder);
 #else
 	//~ vStream = av_new_stream(fctx, 0);
