@@ -3,6 +3,47 @@
 All notable changes to this project will be documented in this file.
 
 
+## [v0.10.5] - 2020-09-08
+
+- Fixed occasional crash in event handlers [[Issue-2312](https://github.com/meetecho/janus-gateway/issues/2312)]
+- Fixed occasional crash in VideoRoom plugin [[Issue-2318](https://github.com/meetecho/janus-gateway/issues/2318)]
+- Fixed missing PLI when switching Streaming mountpoint [[Issue-2333](https://github.com/meetecho/janus-gateway/issues/2333)]
+- Fixed broken recordings in VideoCall plugin (thanks @SamyCookie!) [[PR-2325](https://github.com/meetecho/janus-gateway/pull/2325)]
+- Fixed "kick" not working in TextRoom plugin (thanks @backface!) [[PR-2332](https://github.com/meetecho/janus-gateway/pull/2332)]
+- Fixed occasional post-processing issues with incomplete mjr files (thanks @SamyCookie!) [[PR-2356](https://github.com/meetecho/janus-gateway/pull/2356)]
+- Other smaller fixes and improvements (thanks to all who contributed pull requests and reported issues!)
+
+## [v0.10.4] - 2020-08-07
+
+- Fixed usrsctp vulnerability by using internal hashmap in SCTP code [[PR-2302](https://github.com/meetecho/janus-gateway/pull/2302)]
+- Fixed some issues when using BoringSSL for DTLS (thanks @fancycode!) [[PR-2278](https://github.com/meetecho/janus-gateway/pull/2278)]
+- Added support for multiple nat-1-1 addresses (thanks @fancycode!) [[PR-2279](https://github.com/meetecho/janus-gateway/pull/2279)]
+- Fixed negotiation issue on Firefox when Janus is built without datachannels [[PR-2281](https://github.com/meetecho/janus-gateway/pull/2281)]
+- Fixed small memory leaks when dealing with local candidates (thanks @fancycode!) [[PR-2288](https://github.com/meetecho/janus-gateway/pull/2288)]
+- Fixed occasional segfault in VideoRoom when failing to setup a new subscriber [[Issue-2277](https://github.com/meetecho/janus-gateway/issues/2277)]
+- Fixed potential deadlock in AudioBridge when switching rooms (thanks @JeckLabs!) [[PR-2280](https://github.com/meetecho/janus-gateway/pull/2280)]
+- Fixed small memory leak in AudioBridge (thanks @JeckLabs!) [[PR-2298](https://github.com/meetecho/janus-gateway/pull/2298)]
+- Fixed occasional segfault in VideoCall when hanging up calls [[Issue-2300](https://github.com/meetecho/janus-gateway/issues/2300)]
+- Fixed occasional curl hiccups with RTSP on some cameras
+- Added reconnect mechanism to RabbitMQ event handler (thanks @david-goncalves!) [[PR-2267](https://github.com/meetecho/janus-gateway/pull/2267)]
+- Extended MQTT support in transport and event handler to v5 (thanks @feymartynov!) [[PR-2273](https://github.com/meetecho/janus-gateway/pull/2273)]
+- Added settings to configure MQTT buffers in the transport plugin (thanks @feymartynov!) [[PR-2286](https://github.com/meetecho/janus-gateway/pull/2286)]
+- Other smaller fixes and improvements (thanks to all who contributed pull requests and reported issues!)
+
+
+## [v0.10.3] - 2020-07-09
+
+- Fixed occasional crashes in VideoRoom related to subscribers activity [[PR-2236](https://github.com/meetecho/janus-gateway/pull/2236)] [[PR-2253](https://github.com/meetecho/janus-gateway/pull/2253)]
+- Fixed AudioBridge compilation issues when libogg is missing (thanks @ffontaine!) [[PR-2238](https://github.com/meetecho/janus-gateway/pull/2238)]
+- Fixed broken SRTP forwarders in AudioBridge [[PR-2258](https://github.com/meetecho/janus-gateway/pull/2258)]
+- Fixed occasional segfaults due to race conditions in SIP plugin [[PR-2247](https://github.com/meetecho/janus-gateway/pull/2247)]
+- Fixed occasional recording issues in Janus and Duktape plugins
+- Added timeout (120s) on idle connections in HTTP transport
+- Fixed Opus recordings occasionally being way too large than the source file when processed via janus-pp-rec (thanks @neilkinnish!) [[PR-2250](https://github.com/meetecho/janus-gateway/pull/2250)]
+- Added a new web demo to use canvas elements as a media source for PeerConnections [[PR-2261](https://github.com/meetecho/janus-gateway/pull/2261)]
+- Other smaller fixes and improvements (thanks to all who contributed pull requests and reported issues!)
+
+
 ## [v0.10.2] - 2020-06-17
 
 - Fixed sscanf-related security issues [[PR-2229](https://github.com/meetecho/janus-gateway/pull/2229)]
