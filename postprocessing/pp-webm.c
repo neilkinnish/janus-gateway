@@ -561,6 +561,12 @@ int janus_pp_webm_process(FILE *file, janus_pp_frame_packet *list, gboolean vp8,
 					uint8_t ybit = (vp9pd & 0x10);
 					uint8_t gbit = (vp9pd & 0x08);
 					if(ybit) {
+						/* Is this the first keyframe we find?
+						 * (FIXME assuming this really means "keyframe...) */
+						if(!keyframe_found) {
+							keyframe_found = TRUE;
+							JANUS_LOG(LOG_INFO, "First keyframe: %"SCNu64"\n", tmp->ts-list->ts);
+						}
 						/* Iterate on all spatial layers and get resolution */
 						buffer++;
 						len--;
@@ -568,11 +574,9 @@ int janus_pp_webm_process(FILE *file, janus_pp_frame_packet *list, gboolean vp8,
 						int i=0;
 						for(i=0; i<n_s; i++) {
 							/* Been there, done that: skip skip skip */
-
 							// buffer += 4;
 							// len -= 4;
 							// skipped += 4;
-
 
 							int width = *buffer & 0xFF;
 							buffer++;
@@ -587,13 +591,10 @@ int janus_pp_webm_process(FILE *file, janus_pp_frame_packet *list, gboolean vp8,
 							buffer++;
 							len--;
 
-							JANUS_LOG(LOG_INFO, "  -- %dx%d\n", width, height);
-						}
-						/* Is this the first keyframe we find?
-						 * (FIXME assuming this really means "keyframe...) */
-						if(!keyframe_found) {
-							keyframe_found = TRUE;
-							JANUS_LOG(LOG_INFO, "First keyframe: %"SCNu64"\n", tmp->ts-list->ts);
+							if (width && height) {
+								avcodec_set_dimensions(vEncoder, width, height;
+								JANUS_LOG(LOG_VERB, "(seq=%"SCNu16", ts=%"SCNu64") Key frame: %dx%d (scale=%dx%d)\n", tmp->seq, tmp->ts, width, height, width, height);
+							}
 						}
 					}
 					if(gbit) {
