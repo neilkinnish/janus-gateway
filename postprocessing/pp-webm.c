@@ -497,7 +497,6 @@ int janus_pp_webm_process(FILE *file, janus_pp_frame_packet *list, gboolean vp8,
 						}
 					}
 				}
-
 			} else {
 				/* VP9 depay */
 					/* https://tools.ietf.org/html/draft-ietf-payload-vp9-02 */
@@ -561,6 +560,7 @@ int janus_pp_webm_process(FILE *file, janus_pp_frame_packet *list, gboolean vp8,
 					uint8_t ybit = (vp9pd & 0x10);
 					uint8_t gbit = (vp9pd & 0x08);
 					if(ybit) {
+						keyFrame = 1;
 						/* Is this the first keyframe we find?
 						 * (FIXME assuming this really means "keyframe...) */
 						if(!keyframe_found) {
