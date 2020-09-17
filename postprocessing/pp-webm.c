@@ -115,10 +115,11 @@ int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8) {
 	vStream = avformat_new_stream(fctx, codec);
 	vStream->id = fctx->nb_streams-1;
 	vEncoder = avcodec_alloc_context3(codec);
-	vEncoder->width = max_width*2;
-	vEncoder->height = max_height*2;
-	vEncoder->coded_width = max_width*2;
-	vEncoder->coded_height = max_height*2;
+	// vEncoder->width = max_width;
+	// vEncoder->height = max_height;
+	// vEncoder->coded_width = max_width;
+	// vEncoder->coded_height = max_height;
+	JANUS_LOG(LOG_INFO, "  >> %dx%d\n", max_width, max_height);
 	vEncoder->time_base = (AVRational){ 1, fps };
 	vEncoder->pix_fmt = AV_PIX_FMT_YUV420P;
 	vEncoder->flags |= CODEC_FLAG_GLOBAL_HEADER;
@@ -155,6 +156,7 @@ int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8) {
 	vStream->codec->time_base = (AVRational){1, fps};
 	vStream->codec->width = max_width;
 	vStream->codec->height = max_height;
+	JANUS_LOG(LOG_INFO, "  >> %dx%d\n", max_width, max_height);
 	vStream->codec->pix_fmt = PIX_FMT_YUV420P;
 	if (fctx->flags & AVFMT_GLOBALHEADER)
 		vStream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
