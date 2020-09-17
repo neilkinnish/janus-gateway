@@ -592,7 +592,7 @@ int janus_pp_webm_process(FILE *file, janus_pp_frame_packet *list, gboolean vp8,
 							len--;
 
 							if (width && height) {
-								avcodec_set_dimensions(vEncoder, width, height;
+								avcodec_set_dimensions(vEncoder, width, height);
 								JANUS_LOG(LOG_VERB, "(seq=%"SCNu16", ts=%"SCNu64") Key frame: %dx%d (scale=%dx%d)\n", tmp->seq, tmp->ts, width, height, width, height);
 							}
 						}
