@@ -115,12 +115,11 @@ int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8) {
 	vStream = avformat_new_stream(fctx, codec);
 	vStream->id = fctx->nb_streams-1;
 	vEncoder = avcodec_alloc_context3(codec);
-	vEncoder->codec_type = AVMEDIA_TYPE_VIDEO;
 	JANUS_LOG(LOG_INFO, "  >> %dx%d\n", max_width, max_height);
 	vEncoder->time_base = (AVRational){ 1, fps };
 	vEncoder->width = max_width;
 	vEncoder->height = max_height;
-	vEncoder->pix_fmt = AV_PIX_FMT_YUV420P;
+	vEncoder->pix_fmt = AV_PIX_FMT_YUV422P;//AV_PIX_FMT_YUV420P;
 	vEncoder->flags |= CODEC_FLAG_GLOBAL_HEADER;
 	if(avcodec_open2(vEncoder, codec, NULL) < 0) {
 		/* Error opening video codec */
