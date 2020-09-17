@@ -119,8 +119,6 @@ int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8) {
 	vEncoder->time_base = (AVRational){ 1, fps };
 	vEncoder->width = max_width;
 	vEncoder->height = max_height;
-	vEncoder->sample_aspect_ratio.num = 1;
-	vEncoder->sample_aspect_ratio.den = 1;
 	vEncoder->pix_fmt = AV_PIX_FMT_YUV420P;
 	vEncoder->flags |= CODEC_FLAG_GLOBAL_HEADER;
 	if(avcodec_open2(vEncoder, codec, NULL) < 0) {
@@ -570,9 +568,26 @@ int janus_pp_webm_process(FILE *file, janus_pp_frame_packet *list, gboolean vp8,
 						int i=0;
 						for(i=0; i<n_s; i++) {
 							/* Been there, done that: skip skip skip */
-							buffer += 4;
-							len -= 4;
-							skipped += 4;
+
+							// buffer += 4;
+							// len -= 4;
+							// skipped += 4;
+
+
+							int width = *buffer & 0xFF;
+							buffer++;
+							len--;
+							width = (width << 8) + (*buffer & 0xFF);
+							buffer++;
+							len--;
+							int height = *buffer & 0xFF;
+							buffer++;
+							len--;
+							height = (height << 8) + (*buffer & 0xFF);
+							buffer++;
+							len--;
+
+							JANUS_LOG(LOG_INFO, "  -- %dx%d\n", width, height);
 						}
 						/* Is this the first keyframe we find?
 						 * (FIXME assuming this really means "keyframe...) */
