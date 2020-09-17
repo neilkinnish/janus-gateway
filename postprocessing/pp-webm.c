@@ -96,6 +96,10 @@ int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8) {
 	/* We save the metadata part as a comment (see #1189) */
 	if(metadata)
 		av_dict_set(&fctx->metadata, "comment", metadata, 0);
+
+	av_dict_set(&fctx->metadata, "width", max_width, 0);
+	av_dict_set(&fctx->metadata, "height", max_height, 0);
+
 	fctx->oformat = av_guess_format("webm", NULL, NULL);
 	if(fctx->oformat == NULL) {
 		JANUS_LOG(LOG_ERR, "Error guessing format\n");
@@ -560,7 +564,6 @@ int janus_pp_webm_process(FILE *file, janus_pp_frame_packet *list, gboolean vp8,
 					uint8_t ybit = (vp9pd & 0x10);
 					uint8_t gbit = (vp9pd & 0x08);
 					if(ybit) {
-						keyFrame = 1;
 						/* Is this the first keyframe we find?
 						 * (FIXME assuming this really means "keyframe...) */
 						if(!keyframe_found) {
@@ -574,26 +577,26 @@ int janus_pp_webm_process(FILE *file, janus_pp_frame_packet *list, gboolean vp8,
 						int i=0;
 						for(i=0; i<n_s; i++) {
 							/* Been there, done that: skip skip skip */
-							// buffer += 4;
-							// len -= 4;
-							// skipped += 4;
+							buffer += 4;
+							len -= 4;
+							skipped += 4;
 
-							int width = *buffer & 0xFF;
-							buffer++;
-							len--;
-							width = (width << 8) + (*buffer & 0xFF);
-							buffer++;
-							len--;
-							int height = *buffer & 0xFF;
-							buffer++;
-							len--;
-							height = (height << 8) + (*buffer & 0xFF);
-							buffer++;
-							len--;
+							// int width = *buffer & 0xFF;
+							// buffer++;
+							// len--;
+							// width = (width << 8) + (*buffer & 0xFF);
+							// buffer++;
+							// len--;
+							// int height = *buffer & 0xFF;
+							// buffer++;
+							// len--;
+							// height = (height << 8) + (*buffer & 0xFF);
+							// buffer++;
+							// len--;
 
-							if (width && height) {
-								JANUS_LOG(LOG_VERB, "(seq=%"SCNu16", ts=%"SCNu64") Key frame: %dx%d (scale=%dx%d)\n", tmp->seq, tmp->ts, width, height, width, height);
-							}
+							// if (width && height) {
+							// 	JANUS_LOG(LOG_VERB, "(seq=%"SCNu16", ts=%"SCNu64") Key frame: %dx%d (scale=%dx%d)\n", tmp->seq, tmp->ts, width, height, width, height);
+							// }
 						}
 					}
 					if(gbit) {
