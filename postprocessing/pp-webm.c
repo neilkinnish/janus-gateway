@@ -119,7 +119,9 @@ int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8) {
 	vEncoder->time_base = (AVRational){ 1, fps };
 	vEncoder->width = max_width;
 	vEncoder->height = max_height;
-	vEncoder->pix_fmt = AV_PIX_FMT_YUV422P;//AV_PIX_FMT_YUV420P;
+	vEncoder->sample_aspect_ratio.num = 1;
+	vEncoder->sample_aspect_ratio.den = 1;
+	vEncoder->pix_fmt = AV_PIX_FMT_YUV420P;
 	vEncoder->flags |= CODEC_FLAG_GLOBAL_HEADER;
 	if(avcodec_open2(vEncoder, codec, NULL) < 0) {
 		/* Error opening video codec */
