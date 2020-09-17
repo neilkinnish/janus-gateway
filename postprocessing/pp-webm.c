@@ -97,9 +97,11 @@ int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8) {
 	if(metadata)
 		av_dict_set(&fctx->metadata, "comment", metadata, 0);
 
-	char dimensions[20];
-    g_snprintf(dimensions, sizeof dimensions, "%dx%d", max_width, max_height);
-	av_dict_set(&fctx->metadata, "dimensions", dimensions, 0);
+	if (!vp8) {
+		char dimensions[20];
+		snprintf(dimensions, sizeof(dimensions), "%dx%d", max_width, max_height);
+		av_dict_set(&fctx->metadata, "dimensions", dimensions, 0);
+	}
 
 	fctx->oformat = av_guess_format("webm", NULL, NULL);
 	if(fctx->oformat == NULL) {
@@ -120,7 +122,6 @@ int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8) {
 	vStream = avformat_new_stream(fctx, codec);
 	vStream->id = fctx->nb_streams-1;
 	vEncoder = avcodec_alloc_context3(codec);
-	JANUS_LOG(LOG_INFO, "  >> %dx%d\n", max_width, max_height);
 	vEncoder->time_base = (AVRational){ 1, fps };
 	vEncoder->width = max_width;
 	vEncoder->height = max_height;
