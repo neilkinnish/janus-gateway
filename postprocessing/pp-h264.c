@@ -295,6 +295,7 @@ int janus_pp_h264_preprocess(FILE *file, janus_pp_frame_packet *list) {
 			dimension_item dimensions;
 			dimensions.width = width;
 			dimensions.height = height;
+			JANUS_LOG(LOG_INFO, "  prebuffer -- %dx%d\n", width, height);
 			dimensions.seq = tmp->seq;
 			insert_dimension_array(&dimension_arr, dimensions);
 		} else if((prebuffer[0] & 0x1F) == 24) {
@@ -318,6 +319,7 @@ int janus_pp_h264_preprocess(FILE *file, janus_pp_frame_packet *list) {
 					dimension_item dimensions;
 					dimensions.width = width;
 					dimensions.height = height;
+					JANUS_LOG(LOG_INFO, "  nal7 -- %dx%d\n", width, height);
 					dimensions.seq = tmp->seq;
 					insert_dimension_array(&dimension_arr, dimensions);
 				}
