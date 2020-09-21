@@ -356,7 +356,7 @@ int janus_pp_h265_preprocess(FILE *file, janus_pp_frame_packet *list) {
                 totalFrames++;
                 tmp = tmp->next;
         }
-	dimension_item dimensions = get_optimal_dimensions(dimension_arr.array, totalFrames, dimension_arr.used, 10);
+	dimension_item dimensions = get_optimal_dimensions(dimension_arr.array, dimension_arr.used, totalFrames, 10);
 	max_width = dimensions.width;
 	max_height = dimensions.height;
 	free_dimension_array(&dimension_arr);
