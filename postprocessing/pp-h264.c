@@ -105,8 +105,10 @@ int janus_pp_h264_create(char *destination, char *metadata, gboolean faststart) 
 	vEncoder->height = max_height;
 	vEncoder->time_base = (AVRational){ 1, fps };
 	vEncoder->pix_fmt = AV_PIX_FMT_YUV420P;
-	// vEncoder->flags |= CODEC_FLAG_GLOBAL_HEADER;
-	JANUS_LOG(LOG_ERR, "REMOVED header ----\n");
+	if (vEncoder->codec_id  == AV_CODEC_ID_H264) {
+       av_opt_set(vEncoder->priv_data, "preset", "ultrafast", 0);
+    }
+	vEncoder->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 	if(avcodec_open2(vEncoder, codec, NULL) < 0) {
 		/* Error opening video codec */
 		JANUS_LOG(LOG_ERR, "Encoder error\n");
@@ -140,9 +142,8 @@ int janus_pp_h264_create(char *destination, char *metadata, gboolean faststart) 
 	vStream->codec->width = max_width;
 	vStream->codec->height = max_height;
 	vStream->codec->pix_fmt = PIX_FMT_YUV420P;
-	JANUS_LOG(LOG_ERR, "Dropped header ----\n");
 	//~ if (fctx->flags & AVFMT_GLOBALHEADER)
-		// vStream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
+		vStream->codec->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 #endif
 	AVDictionary *options = NULL;
 
