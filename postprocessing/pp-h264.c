@@ -125,8 +125,11 @@ int janus_pp_h264_create(char *destination, char *metadata, gboolean faststart) 
 #endif
 #if LIBAVCODEC_VER_AT_LEAST(54, 25)
 	vStream->codec->codec_id = AV_CODEC_ID_H264;
+	// vStream->codec->profile = FF_PROFILE_H264_CONSTRAINED_BASELINE;
 #else
 	vStream->codec->codec_id = CODEC_ID_H264;
+	av_opt_set(vStream->codec->priv_data, "preset", "ultrafast", 0);
+	JANUS_LOG(LOG_ERR, "Added preset ----\n");
 #endif
 	vStream->codec->codec_type = AVMEDIA_TYPE_VIDEO;
 	vStream->codec->time_base = (AVRational){1, fps};
@@ -134,11 +137,11 @@ int janus_pp_h264_create(char *destination, char *metadata, gboolean faststart) 
 	vStream->codec->width = max_width;
 	vStream->codec->height = max_height;
 	vStream->codec->pix_fmt = PIX_FMT_YUV420P;
+	JANUS_LOG(LOG_ERR, "Dropped header ----\n");
 	//~ if (fctx->flags & AVFMT_GLOBALHEADER)
-		vStream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
+		// vStream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
 #endif
 	AVDictionary *options = NULL;
-	av_dict_set(&options, "vf", "scale=-2:1080", 0);
 
 	if(faststart)
 		av_dict_set(&options, "movflags", "+faststart", 0);
