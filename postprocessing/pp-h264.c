@@ -109,7 +109,7 @@ int janus_pp_h264_create(char *destination, char *metadata, gboolean faststart) 
 
 	av_opt_set(vEncoder, "preset", "ultrafast", 0);
 
-	// vEncoder->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+	vEncoder->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 
 	avcodec_parameters_from_context(vStream->codecpar, vEncoder);
 
