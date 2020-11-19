@@ -101,19 +101,29 @@ int janus_pp_h264_create(char *destination, char *metadata, gboolean faststart) 
 	vStream = avformat_new_stream(fctx, codec);
 	vStream->id = fctx->nb_streams-1;
 	vEncoder = avcodec_alloc_context3(codec);
+
+    vStream->codecpar->width = max_width;
+    vStream->codecpar->height = max_height;
+    vStream->codecpar->format = AV_PIX_FMT_YUV420P;
+    vStream->time_base = (AVRational){ 1, fps };
+
+	avcodec_parameters_to_context(vEncoder, vStream->codecpar);
+
 	vEncoder->width = max_width;
 	vEncoder->height = max_height;
 	vEncoder->time_base = (AVRational){ 1, fps };
 	vEncoder->pix_fmt = AV_PIX_FMT_YUV420P;
-	if (vEncoder->codec_id  == AV_CODEC_ID_H264) {
-       av_opt_set(vEncoder->priv_data, "preset", "ultrafast", 0);
-    }
+
+	// av_opt_set(vEncoder->priv_data, "preset", "ultrafast", 0);
+
 	vEncoder->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+
 	if(avcodec_open2(vEncoder, codec, NULL) < 0) {
 		/* Error opening video codec */
 		JANUS_LOG(LOG_ERR, "Encoder error\n");
 		return -1;
 	}
+
 	avcodec_parameters_from_context(vStream->codecpar, vEncoder);
 #else
 	vStream = avformat_new_stream(fctx, 0);
@@ -128,13 +138,8 @@ int janus_pp_h264_create(char *destination, char *metadata, gboolean faststart) 
 #endif
 #if LIBAVCODEC_VER_AT_LEAST(54, 25)
 	vStream->codec->codec_id = AV_CODEC_ID_H264;
-	av_opt_set(vStream->codec->priv_data, "preset", "ultrafast", 0);
-	JANUS_LOG(LOG_ERR, "Added preset ----\n");
-	// vStream->codec->profile = FF_PROFILE_H264_CONSTRAINED_BASELINE;
 #else
 	vStream->codec->codec_id = CODEC_ID_H264;
-	av_opt_set(vStream->codec->priv_data, "preset", "ultrafast", 0);
-	JANUS_LOG(LOG_ERR, "Added preset ----\n");
 #endif
 	vStream->codec->codec_type = AVMEDIA_TYPE_VIDEO;
 	vStream->codec->time_base = (AVRational){1, fps};
