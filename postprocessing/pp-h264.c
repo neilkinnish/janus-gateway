@@ -105,6 +105,8 @@ int janus_pp_h264_create(char *destination, char *metadata, gboolean faststart) 
 	vEncoder->height = max_height;
 	vEncoder->time_base = (AVRational){ 1, fps };
 	vEncoder->pix_fmt = AV_PIX_FMT_YUV420P;
+	vEncoder->gop_size = 25;
+	vEncoder->level = 31;
 	vEncoder->flags |= CODEC_FLAG_GLOBAL_HEADER;
 	if(avcodec_open2(vEncoder, codec, NULL) < 0) {
 		/* Error opening video codec */
@@ -134,6 +136,8 @@ int janus_pp_h264_create(char *destination, char *metadata, gboolean faststart) 
 	vStream->codec->width = max_width;
 	vStream->codec->height = max_height;
 	vStream->codec->pix_fmt = PIX_FMT_YUV420P;
+	vStream->codec->gop_size = 25;
+	vStream->codec->level = 31;
 	//~ if (fctx->flags & AVFMT_GLOBALHEADER)
 		vStream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
 #endif
