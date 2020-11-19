@@ -105,7 +105,8 @@ int janus_pp_h264_create(char *destination, char *metadata, gboolean faststart) 
 	vEncoder->height = max_height;
 	vEncoder->time_base = (AVRational){ 1, fps };
 	vEncoder->pix_fmt = AV_PIX_FMT_YUV420P;
-	vEncoder->flags |= CODEC_FLAG_GLOBAL_HEADER;
+	// vEncoder->flags |= CODEC_FLAG_GLOBAL_HEADER;
+	JANUS_LOG(LOG_ERR, "REMOVED header ----\n");
 	if(avcodec_open2(vEncoder, codec, NULL) < 0) {
 		/* Error opening video codec */
 		JANUS_LOG(LOG_ERR, "Encoder error\n");
@@ -125,6 +126,8 @@ int janus_pp_h264_create(char *destination, char *metadata, gboolean faststart) 
 #endif
 #if LIBAVCODEC_VER_AT_LEAST(54, 25)
 	vStream->codec->codec_id = AV_CODEC_ID_H264;
+	av_opt_set(vStream->codec->priv_data, "preset", "ultrafast", 0);
+	JANUS_LOG(LOG_ERR, "Added preset ----\n");
 	// vStream->codec->profile = FF_PROFILE_H264_CONSTRAINED_BASELINE;
 #else
 	vStream->codec->codec_id = CODEC_ID_H264;
