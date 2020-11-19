@@ -102,21 +102,16 @@ int janus_pp_h264_create(char *destination, char *metadata, gboolean faststart) 
 	vStream->id = fctx->nb_streams-1;
 	vEncoder = avcodec_alloc_context3(codec);
 
-    vStream->codecpar->width = max_width;
-    vStream->codecpar->height = max_height;
-    vStream->codecpar->format = AV_PIX_FMT_YUV420P;
-    vStream->time_base = (AVRational){ 1, fps };
-
-	avcodec_parameters_to_context(vEncoder, vStream->codecpar);
-
 	vEncoder->width = max_width;
 	vEncoder->height = max_height;
 	vEncoder->time_base = (AVRational){ 1, fps };
 	vEncoder->pix_fmt = AV_PIX_FMT_YUV420P;
 
-	// av_opt_set(vEncoder->priv_data, "preset", "ultrafast", 0);
+	av_opt_set(vEncoder, "preset", "ultrafast", 0);
 
-	vEncoder->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+	// vEncoder->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+
+	avcodec_parameters_from_context(vStream->codecpar, vEncoder);
 
 	if(avcodec_open2(vEncoder, codec, NULL) < 0) {
 		/* Error opening video codec */
@@ -124,7 +119,7 @@ int janus_pp_h264_create(char *destination, char *metadata, gboolean faststart) 
 		return -1;
 	}
 
-	avcodec_parameters_from_context(vStream->codecpar, vEncoder);
+	
 #else
 	vStream = avformat_new_stream(fctx, 0);
 	if(vStream == NULL) {
