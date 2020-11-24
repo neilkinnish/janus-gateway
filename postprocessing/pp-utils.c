@@ -38,5 +38,10 @@ dimension_item get_optimal_dimensions(dimension_item arr[], int len, int totalFr
 		}
 	}
 
+	// HOTFIX for iOS recording 718 width
+	if (dimensions.width == 718 && dimensions.height == 1280) {
+		dimensions.width = 720;
+	}
+
 	return dimensions;
 }
