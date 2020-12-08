@@ -94,12 +94,13 @@ int janus_pp_webm_create(char *destination, char *metadata, gboolean vp8) {
 		return -1;
 	}
 	/* We save the metadata part as a comment (see #1189) */
-	if(metadata)
+	if(metadata) {
 		av_dict_set(&fctx->metadata, "comment", metadata, 0);
 
-	char dimensions[20];
-	snprintf(dimensions, sizeof(dimensions), "%dx%d", max_width, max_height);
-	av_dict_set(&fctx->metadata, "dimensions", dimensions, 0);
+		char dimensions[20];
+		snprintf(dimensions, sizeof(dimensions), "%dx%d", max_width, max_height);
+		av_dict_set(&fctx->metadata, "dimensions", dimensions, 0);
+	}
 
 	fctx->oformat = av_guess_format("webm", NULL, NULL);
 	if(fctx->oformat == NULL) {
