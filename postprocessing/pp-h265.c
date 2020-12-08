@@ -77,7 +77,7 @@ int janus_pp_h265_create(char *destination, char *metadata, gboolean faststart) 
 
                 char dimensions[20];
 		snprintf(dimensions, sizeof(dimensions), "%dx%d", max_width, max_height);
-		av_dict_set(&fctx->metadata, "dimensions", dimensions, 0);
+		av_dict_set(&fctx->metadata, "description", dimensions, 0);
         }
         fctx->oformat = av_guess_format("mp4", NULL, NULL);
         if (fctx->oformat == NULL) {
