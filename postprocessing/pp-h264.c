@@ -82,6 +82,11 @@ int janus_pp_h264_create(char *destination, char *metadata, gboolean faststart) 
 	/* We save the metadata part as a comment (see #1189) */
 	if(metadata)
 		av_dict_set(&fctx->metadata, "comment", metadata, 0);
+
+	char dimensions[20];
+	snprintf(dimensions, sizeof(dimensions), "%dx%d", max_width, max_height);
+	av_dict_set(&fctx->metadata, "dimensions", dimensions, 0);
+
 	fctx->oformat = av_guess_format("mp4", NULL, NULL);
 	if(fctx->oformat == NULL) {
 		JANUS_LOG(LOG_ERR, "Error guessing format\n");
